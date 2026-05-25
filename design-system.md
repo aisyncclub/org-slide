@@ -1,6 +1,6 @@
 # org-slide 디자인 시스템 (공통)
 
-두 프리셋(`knih` / `mice`)이 공유하는 레이아웃 원칙·컴포넌트·검증 기준.
+두 프리셋(`institutional` / `event`)이 공유하는 레이아웃 원칙·컴포넌트·검증 기준.
 프리셋별 컬러/폰트 토큰은 `presets/*.md` 가 `:root` 변수로 덮어쓴다.
 
 ---
@@ -20,13 +20,12 @@
 ```html
 <!-- 공통: Pretendard (본문 표준) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<!-- knih: Noto Sans KR / Noto Serif KR -->
-<!-- mice: Montserrat (라틴 디스플레이) -->
+<!-- institutional: Noto Sans KR / Noto Serif KR -->
+<!-- event: Montserrat (라틴 디스플레이) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<!-- 모션 (선택) -->
+<!-- 모션 (선택, ScrollTrigger 불필요 — §7 뷰어가 전환 시 재생) -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 ```
 
 ---
@@ -102,7 +101,7 @@
 
 - `.hl` = 형광펜 강조. **슬라이드당 최대 2회**. 남발 금지.
 - 핵심 수치는 `--mono` + 큰 사이즈로. 단위는 작게.
-- italic은 mice 프리셋의 영문 라벨에만 허용. knih는 italic 금지(기관 정제성).
+- italic은 event 프리셋의 영문 라벨에만 허용. institutional는 italic 금지(기관 정제성).
 
 ---
 
@@ -110,10 +109,10 @@
 
 | 프리셋 | 모션 |
 |---|---|
-| knih | 절제된 `opacity 0→1 + translateY 16px→0`, stagger 0.06s. 화려한 효과 금지. |
-| mice | `scale 0.96→1 + glow`, 배경 radial orb 부드러운 float, 수치 카운트업 허용. |
+| institutional | 절제된 `opacity 0→1 + translateY 16px→0`, stagger 0.06s. 화려한 효과 금지. |
+| event | `scale 0.96→1 + glow(box-shadow)`, 수치 카운트업 허용. **솔리드 배경**(radial orb·그라데이션 미사용). |
 
-GSAP ScrollTrigger로 각 `.slide` 진입 시 1회 재생. 모션 실패해도 콘텐츠는 항상 보이게(기본 opacity 1 fallback).
+슬라이드 전환 시 base.html의 `reveal()`로 `[data-anim]`을 1회 재생(§7 뷰어). 모션 실패해도 콘텐츠는 항상 보이게(기본 opacity 1 fallback).
 
 ---
 
@@ -139,24 +138,24 @@ Chart.defaults.font.family = 'Pretendard, "Noto Sans KR", sans-serif';
 Chart.defaults.font.weight = 500;
 Chart.defaults.plugins.legend.labels.usePointStyle = true;
 Chart.defaults.plugins.legend.labels.boxWidth = 8;
-// knih:  text=#3A4A60, grid=#DBE1EA
-// mice:  text=#C3CCE6, grid=rgba(140,160,210,.18)
-// mice-light: text=#41506B, grid=#E2E7F0
+// institutional:  text=#3A4A60, grid=#DBE1EA
+// event:  text=#C3CCE6, grid=rgba(140,160,210,.18)
+// event-light: text=#41506B, grid=#E2E7F0
 ```
 
 **프리셋별 데이터 팔레트**
 
 | 프리셋 | 시리즈 색 (순서대로) |
 |---|---|
-| knih | `#003764` · `#1E5BA8` · `#4F86C6` · `#9BB8DE` (강조 1개만 `#E4032E`) |
-| mice (dark) | `#00C2D1` · `#5B7BF0` · `#E5267E` · `#E8B864` |
-| mice-light | `#0094B3` · `#3D5CD6` · `#D81E74` · `#C8922F` (라이트 위 대비 확보) |
+| institutional | `#003764` · `#1E5BA8` · `#4F86C6` · `#9BB8DE` (강조 1개만 `#E4032E`) |
+| event (dark) | `#00C2D1` · `#5B7BF0` · `#E5267E` · `#E8B864` |
+| event-light | `#0094B3` · `#3D5CD6` · `#D81E74` · `#C8922F` (라이트 위 대비 확보) |
 
 **규칙**
 - 차트 캔버스는 고정 높이 컨테이너(`<div style="height:300px">`)에 넣어 비율 깨짐 방지.
 - `responsive:true, maintainAspectRatio:false`.
 - 막대/도넛은 `borderRadius`·여백으로 모던하게. 격자선 최소화(`grid.display` 선별).
-- 그라데이션 fill은 캔버스 컨텍스트로 생성(mice 다크에서 효과적).
+- fill은 **단색**(필요 시 알파). ⚠️ event 프리셋은 그라데이션 미사용 → `createLinearGradient` 금지, 단색만.
 - 차트마다 **한 줄 캡션(So What)** 을 아래에 붙여 의미를 전달.
 - 모션 실패/차트 미로드 시에도 제목·캡션은 보이게(차트는 보조).
 
@@ -168,7 +167,7 @@ Chart.defaults.plugins.legend.labels.boxWidth = 8;
 | **Process Flow** | `.flow .step` (화살표 연결) | 단계/절차 시각화 |
 | **Comparison** | `.vs` (좌 Before / 우 After) | 도입 전후·A vs B |
 | **Icon Grid** | `.icongrid .ic` | 항목 4-6개 카드(SVG 픽토그램) |
-| **Progress / Gauge** | `.gauge` (conic-gradient) | 비율·달성도 원형 게이지 |
+| **Progress / Gauge** | `.gauge` (institutional=conic-gradient 허용 / event=SVG stroke 단색) | 비율·달성도 원형 게이지 |
 | **Donut Legend** | `.donut-legend` | 차트 옆 범례+수치 |
 
 - 아이콘은 **인라인 SVG**(외부 의존 0). stroke=currentColor 로 프리셋 색 자동 적용.
@@ -221,12 +220,12 @@ Chart.defaults.plugins.legend.labels.boxWidth = 8;
 
 ## 5. 자가 검증 체크리스트 (생성 후 필수)
 
-- [ ] 프리셋 토큰이 `:root`에 정확히 주입되었는가 (knih=라이트/blue, mice=다크/cyan)
+- [ ] 프리셋 토큰이 `:root`에 정확히 주입되었는가 (institutional=라이트/blue, event=다크/cyan)
 - [ ] 폰트가 CDN으로 로드되는가 (로컬 의존 0)
 - [ ] 한글 `word-break: keep-all` 적용 — 단어 중간 잘림 없는가
 - [ ] `.hl` 슬라이드당 2회 이하인가
-- [ ] knih: 정부적색 #E4032E 를 강조에만 절제 사용했는가 (면적 과다 금지)
-- [ ] mice: 텍스트 대비비 충분한가 (다크 위 본문 #E8ECF6 이상)
+- [ ] institutional: 시그널 레드 #E4032E 를 강조에만 절제 사용했는가 (면적 과다 금지)
+- [ ] event: 텍스트 대비비 충분한가 (다크 위 본문 #E8ECF6 이상)
 - [ ] 모든 슬라이드에 head(기관/브랜드 마크) + foot(페이지) 일관 적용
 - [ ] 모션 비활성 시에도 모든 텍스트가 보이는가 (fallback)
 - [ ] 슬라이드 1280×720 안에 콘텐츠가 넘치지 않는가

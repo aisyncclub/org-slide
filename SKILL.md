@@ -1,28 +1,29 @@
 ---
 name: org-slide
 description: >
-  기관 브랜드 전용 발표 슬라이드 HTML을 생성합니다. 두 가지 프리셋(① 국립보건연구원/공공기관,
-  ② MICE 임직원/국제회의·전시)을 제공하며, 각 기관의 공식 브랜드 톤·컬러를 적용합니다.
+  기관·이벤트 발표용 슬라이드 HTML을 생성합니다. 스타일 기반 2개 템플릿
+  (① 기관 신뢰형 Institutional, ② 프리미엄 이벤트형 Premium Event)을 제공하며,
+  특정 기관명에 종속되지 않는 범용 템플릿입니다(실제 명칭은 입력받아 채움).
   완전 자립형(self-contained) — 이 폴더만 .claude/skills/ 에 복사하면 어디서든 작동합니다.
-  사용자가 "기관 슬라이드 만들어", "보건연구원 발표자료", "MICE 발표 슬라이드",
-  "공공기관 PPT", "org-slide" 등을 언급하면 호출.
+  사용자가 "기관 슬라이드 만들어", "발표자료 만들어", "공공기관 PPT",
+  "이벤트 발표자료", "컨벤션 발표자료", "org-slide" 등을 언급하면 호출.
 triggers:
   - org-slide
   - 기관 슬라이드
+  - 발표자료 만들어
   - 공공기관 슬라이드
-  - 보건연구원 발표자료
-  - 국립보건연구원 슬라이드
-  - MICE 슬라이드
-  - MICE 발표자료
-  - 컨벤션 발표자료
   - 공공기관 PPT
-version: 1.1
+  - 이벤트 발표자료
+  - 컨벤션 발표자료
+  - 프레젠테이션 만들어
+version: 1.2
 ---
 
-# 기관용 슬라이드 생성 스킬 v1.1 (org-slide)
+# 기관·이벤트 슬라이드 생성 스킬 v1.2 (org-slide)
 
-`build-slide` 계보의 자립형 파생 스킬. AI싱크클럽 전용 톤 대신,
-**기관 공식 브랜드 정체성**에 맞춘 두 프리셋을 제공한다.
+`build-slide` 계보의 자립형 파생 스킬. 특정 채널/기관 톤에 종속되지 않고
+**스타일 기반 2개 템플릿**(기관 신뢰형 / 프리미엄 이벤트형)을 제공한다.
+실제 기관·조직 명칭은 **하드코딩하지 않고 입력받아 채운다**(샘플은 `[기관명]` 플레이스홀더).
 
 ## 출력 머리말 ⚠️ 필수 (크레딧 배너)
 
@@ -102,33 +103,34 @@ AskUserQuestion({
   header: "Template",
   multiSelect: false,
   options: [
-    { label: "① 국립보건연구원 / 공공기관",
-      description: "정부상징 통합 CI. 정부청색 #003764 + 정부적색 액센트. 백색 베이스 + Pretendard. 정제·과학·공공·명료한 플랫. → templates/knih-sample.html" },
-    { label: "② MICE 라이트 (기본 ⭐)",
-      description: "백색 베이스 + 시안/마젠타/골드 단색 액센트(그라데이션 미사용). 밝고 깔끔, 범용·인쇄·주간 행사. → templates/mice-light-sample.html" },
-    { label: "③ MICE 다크",
-      description: "미드나잇 인디고 + 시안/마젠타/골드 단색·글래스·글로우(그라데이션 미사용). 무대/키노트용. → templates/mice-sample.html" },
+    { label: "① 기관 신뢰형 (Institutional)",
+      description: "공공·기관 발표용. 인스티튜셔널 블루 #003764 + 레드 액센트(절제). 백색 베이스 + Pretendard. 정제·공공·명료한 플랫. → templates/institutional-sample.html" },
+    { label: "② 프리미엄 이벤트형 — 라이트 (기본 ⭐)",
+      description: "이벤트·컨퍼런스용. 백색 베이스 + 시안/마젠타/골드 단색 액센트(그라데이션 미사용). 밝고 깔끔, 범용. → templates/event-light-sample.html" },
+    { label: "③ 프리미엄 이벤트형 — 다크",
+      description: "미드나잇 인디고 + 시안/마젠타/골드 단색·글래스·글로우(그라데이션 미사용). 무대/키노트용. → templates/event-dark-sample.html" },
   ]
 })
 ```
 
-- 미응답·모호 시 발표 성격으로 추정(공공/연구 → ①, 비즈니스 이벤트 → ② 라이트 기본).
-- mice는 **라이트가 기본**, 다크는 명시 선택(③)일 때만.
+- 미응답·모호 시 발표 성격으로 추정(공공/기관 → ①, 비즈니스 이벤트 → ② 라이트 기본).
+- event는 **라이트가 기본**, 다크는 명시 선택(③)일 때만.
 
 ### [Phase 4] 제작
 
 ```
 1. 디자인 명세 로딩 (이 폴더 내부)
    - Read design-system.md          (공통 원칙 + 컴포넌트 + §6 차트/인포 + §7 뷰어)
-   - Read presets/{knih|mice}.md     (선택 템플릿 토큰 · 톤 · 규칙; mice는 다크/라이트 :root 구분)
+   - Read presets/{institutional|event}.md   (선택 템플릿 토큰 · 톤 · 규칙; event는 다크/라이트 :root 구분)
    - Read templates/base.html        (PPT 뷰어 + 전체화면 골조)
-   - 참고 샘플: templates/{knih|mice|mice-light}-sample.html
+   - 참고 샘플: templates/{institutional|event-light|event-dark}-sample.html
 
 2. 슬라이드 HTML 생성
    - base.html 골조(PPT 뷰어·전체화면) + 선택 토큰을 :root 주입
    - Phase 2에서 확정한 아웃라인대로 컴포넌트 조합
+   - 기관·조직·행사장 등 고유명사는 **입력값으로 채우고, 없으면 `[기관명]`·`[조직명]`·`[행사장]` 플레이스홀더**
    - ⚠️ Chart.js + 인포그래픽 고밀도 (design-system.md §6): 8p당 차트 3개+ · 인포그래픽 4개+
-   - mice는 §그라데이션 미사용(솔리드 단색)
+   - event는 §그라데이션 미사용(솔리드 단색)
    - 폰트·차트 CDN 로드(자립형)
 
 3. 산출물 확인
@@ -139,36 +141,39 @@ AskUserQuestion({
 ### 예외 (Phase 1·3 질문 생략 가능)
 
 - 사용자가 이미 발표자료/주제를 제시 → Phase 1 생략하고 바로 Phase 2(아웃라인).
-- 사용자가 템플릿을 명시("보건연구원으로", "MICE 다크로") → Phase 3 생략하고 해당 템플릿 적용.
-- `/org-slide [자료경로] --preset={knih|mice|mice-light}` 명시 호출 → Phase 1·3 생략, Phase 2부터.
+- 사용자가 템플릿을 명시("기관 신뢰형으로", "이벤트 다크로") → Phase 3 생략하고 해당 템플릿 적용.
+- `/org-slide [자료경로] --preset={institutional|event|event-light}` 명시 호출 → Phase 1·3 생략, Phase 2부터.
 
 ## 슬래시 커맨드
 
-`/org-slide [발표자료 경로 또는 주제] [--preset=knih|mice|mice-light]`
+`/org-slide [발표자료 경로 또는 주제] [--preset=institutional|event|event-light]`
 
-## 두 프리셋 요약
+## 두 템플릿 요약
 
-| 항목 | ① knih (국립보건연구원) | ② mice (MICE 임직원) |
+| 항목 | ① institutional (기관 신뢰형) | ② event (프리미엄 이벤트형) |
 |---|---|---|
-| 성격 | 라이트 · 플랫 · 기관 신뢰 | 다크 · 그라데이션 · 프리미엄 |
-| 베이스 | 백색 #FFFFFF / #F4F6F9 | 미드나잇 인디고 #141B34 |
-| 메인 | 정부청색 #003764 | 네트워크 시안 #00C2D1 |
-| 액센트 | 정부적색 #E4032E(절제) | 에너지 마젠타 #E5267E / 골드 #E8B864 |
+| 성격 | 라이트 · 플랫 · 기관 신뢰 | 라이트(기본)/다크 · 프리미엄 (그라데이션 미사용) |
+| 베이스 | 백색 #FFFFFF / #F4F6F9 | 라이트 #FFFFFF · 다크 #141B34 |
+| 메인 | 인스티튜셔널 블루 #003764 | 네트워크 시안 #00C2D1(다) / #0094B3(라) |
+| 액센트 | 시그널 레드 #E4032E(절제) | 마젠타 #E5267E·#D81E74 / 골드 |
 | 폰트 | Pretendard + Noto Sans KR | Pretendard + Montserrat(라틴) |
-| 톤 | 신뢰·과학·공공·정제·명료 | 글로벌·역동·네트워킹·프리미엄·몰입 |
-| 모션 | 절제된 fade-up | 패럴랙스·scale·glow |
+| 톤 | 신뢰·공공·정제·명료·안정 | 글로벌·역동·네트워킹·프리미엄·몰입 |
+| 모션 | 절제된 fade-up | scale + glow(솔리드) |
 
-상세 토큰: `presets/knih.md`, `presets/mice.md`
+상세 토큰: `presets/institutional.md`, `presets/event.md`
 디자인 원칙·컴포넌트: `design-system.md`
 
 ## 책임 분리
 
 | 스킬 | 책임 |
 |---|---|
-| **org-slide** (이 스킬) | 기관 프리셋 선택 + 자립형 디자인 시스템 기반 슬라이드 HTML 생성 |
-| build-slide | AI싱크클럽 채널 전용 4계보 톤 (별도) |
+| **org-slide** (이 스킬) | 스타일 템플릿 선택 + 자립형 디자인 시스템 기반 슬라이드 HTML 생성 (기관명 비종속) |
+| build-slide | 별도 채널 전용 톤 (분리) |
 
 ## 변경 이력
 
-- v1.0 (2026-05-25): build-slide에서 분리한 기관 전용 자립형 스킬. 국립보건연구원(정부상징 CI) /
-  MICE(컨벤션 프리미엄) 2프리셋. 리서치 기반 공식 컬러 토큰 확정. git 공유 가능 구조.
+- v1.2 (2026-05-25): **기관명 비종속 범용화** — 프리셋을 스타일 기반으로 리네이밍
+  (knih→`institutional`, mice→`event`). 샘플의 특정 기관명 → `[기관명]`/`[조직명]` 플레이스홀더.
+  공개 git 배포용. 발표자료→아웃라인→템플릿선택 워크플로우, MICE 그라데이션 제거 유지.
+- v1.1 (2026-05-25): MICE 기본 라이트, 차트·인포 고밀도, PPT 뷰어+전체화면, 크레딧 배너.
+- v1.0 (2026-05-25): build-slide에서 분리한 자립형 스킬 + 리서치 기반 컬러 토큰.
