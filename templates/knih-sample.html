@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>국립보건연구원 · org-slide(knih) 샘플 8p</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#FFFFFF;--surface:#F4F6F9;--surface-2:#EAEEF4;--paper-tint:#F8FAFC;--ink:#0F1B2D;--ink-soft:#3A4A60;--ink-dim:#6B7888;--brand:#003764;--brand-2:#1E5BA8;--brand-soft:#DDE7F2;--accent:#E4032E;--rule:#DBE1EA;--hl:#CFE0F2;--display:"Noto Sans KR","Pretendard Variable",Pretendard,sans-serif;--sans:"Pretendard Variable",Pretendard,"Noto Sans KR",sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace;--pad:64px 80px}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:#0B0E14;font-family:var(--sans);color:var(--ink);word-break:keep-all;overflow-wrap:break-word;overflow:hidden}
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.deck{position:relative;width:1280px;height:720px;transform-origin:center center}
+.slide{position:absolute;inset:0;background:var(--bg);overflow:hidden;opacity:0;visibility:hidden;transition:opacity .45s ease;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.slide.active{opacity:1;visibility:visible}
+.slide::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--brand) 0%,var(--brand) 82%,var(--accent) 82%,var(--accent) 100%);z-index:5}
+.body{position:absolute;inset:0;padding:var(--pad);display:flex;flex-direction:column;justify-content:center}
+.head{position:absolute;top:32px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:4}
+.foot{position:absolute;bottom:30px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;color:var(--ink-dim);z-index:4;border-top:1px solid var(--rule);padding-top:14px}
+.foot .pg{font-family:var(--mono);font-weight:600;letter-spacing:.06em}
+.deck-nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;z-index:60;background:rgba(18,22,32,.74);backdrop-filter:blur(10px);padding:7px 12px;border-radius:40px;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.deck-nav button{width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;font-size:18px;background:rgba(255,255,255,.12);color:#fff;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.deck-nav button:hover{background:rgba(255,255,255,.26)}
+.deck-nav .ind{color:#fff;font-family:var(--mono);font-size:13px;min-width:56px;text-align:center;letter-spacing:.05em}
+.cap{position:fixed;top:14px;left:18px;z-index:60;color:rgba(255,255,255,.5);font-size:12px;letter-spacing:.04em}
+.brand{display:inline-flex;align-items:center;gap:11px;font-weight:700;font-size:14px;letter-spacing:.02em;color:var(--ink-soft)}
+.mark{width:18px;height:18px;border-radius:50%;flex-shrink:0;background:conic-gradient(from 140deg,var(--brand) 0 50%,var(--accent) 50% 100%);box-shadow:0 0 0 3px #fff,0 0 0 4px var(--rule)}
+.chap{font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--brand)}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin-bottom:16px}
+.eyebrow::before{content:"";width:26px;height:2px;background:var(--brand)}
+h1.title{font-family:var(--display);font-weight:900;font-size:74px;line-height:1.08;letter-spacing:-.03em;color:var(--brand);max-width:1000px}
+.subtitle{font-family:var(--display);font-weight:700;font-size:28px;line-height:1.34;color:var(--ink);margin-top:16px;max-width:980px}
+.lede{font-size:18px;line-height:1.6;color:var(--ink-soft);max-width:880px;margin-top:16px;font-weight:500}
+.hl{color:var(--brand);font-weight:800;background:linear-gradient(transparent 58%,var(--hl) 58%,var(--hl) 92%,transparent 92%);padding:0 4px}
+.cover-meta{display:grid;grid-template-columns:repeat(4,1fr);margin-top:42px;border-top:2px solid var(--brand);padding-top:22px;max-width:1040px}
+.cover-meta div{padding-right:22px}.cover-meta div+div{border-left:1px solid var(--rule);padding-left:22px}
+.cover-meta .k{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--brand-2);margin-bottom:8px}
+.cover-meta .v{font-family:var(--display);font-weight:700;font-size:18px;color:var(--ink);line-height:1.3}
+.cover-meta .v small{display:block;font-weight:500;font-size:12px;color:var(--ink-dim);margin-top:4px}
+h2.section-h{font-family:var(--display);font-weight:900;font-size:44px;line-height:1.1;letter-spacing:-.025em;color:var(--brand);margin-bottom:6px}
+.so-what{margin-top:12px;padding:11px 16px;background:var(--brand-soft);border-left:4px solid var(--brand);border-radius:0 4px 4px 0;font-size:13px;font-weight:600;color:var(--brand);line-height:1.5;max-width:1040px}
+.agenda-list{display:flex;flex-direction:column;gap:14px;margin-top:18px;max-width:1050px}
+.agenda-item{display:flex;align-items:flex-start;gap:24px;background:var(--surface);border:1px solid var(--rule);border-left:5px solid var(--brand);border-radius:0 6px 6px 0;padding:16px 26px}
+.agenda-num{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--brand);line-height:1;min-width:42px}
+.agenda-title{font-family:var(--display);font-weight:800;font-size:19px;color:var(--ink);line-height:1.2}
+.agenda-desc{font-size:12px;color:var(--ink-soft);font-weight:500;line-height:1.5;margin-top:4px}
+.agenda-stat{display:flex;gap:10px;margin-top:12px}
+.ag-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--brand-soft);color:var(--brand-2)}
+.donut-wrap{display:flex;align-items:center;gap:48px;margin-top:16px}
+.donut-chart-box{width:220px;height:220px;position:relative;flex-shrink:0}
+.dl-item{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--ink-soft);margin-bottom:9px}
+.dl-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.dl-pct{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--ink);margin-left:auto}
+.icongrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px}
+.ic{background:var(--surface);border:1px solid var(--rule);border-top:4px solid var(--brand);border-radius:6px;padding:16px 14px 14px;display:flex;flex-direction:column;gap:7px}
+.ic-icon{width:34px;height:34px;color:var(--brand)}
+.ic-num{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--brand-2)}
+.ic h4{font-family:var(--display);font-weight:800;font-size:14px;line-height:1.25;color:var(--ink)}
+.ic p{font-size:11px;line-height:1.5;color:var(--ink-soft);font-weight:500}
+.ic .tag{font-size:10px;font-weight:700;color:var(--brand);background:var(--brand-soft);padding:3px 8px;border-radius:20px;align-self:flex-start}
+.bar-wrap{margin-top:12px;height:260px;position:relative;width:100%}
+.safety-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;flex:1}
+.sc{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.sc-icon{width:32px;height:32px;color:var(--brand);flex-shrink:0}
+.sc-title{font-family:var(--display);font-weight:800;font-size:14px;color:var(--ink);display:block;margin-bottom:4px}
+.sc-desc{font-size:11px;color:var(--ink-soft);font-weight:500;line-height:1.45}
+.rbadge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;color:#fff;background:var(--accent);padding:2px 7px;border-radius:3px;margin-top:5px}
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:22px 28px;gap:12px;min-width:180px}
+.gauge{width:100px;height:100px;border-radius:50%;background:conic-gradient(var(--brand) 100%,var(--rule) 0);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 8px #fff,0 0 0 9px var(--rule)}
+.gauge-inner{width:68px;height:68px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-num{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--brand);line-height:1}
+.gauge-unit{font-size:9px;font-weight:700;color:var(--brand-2);letter-spacing:.05em}
+.gauge-label{font-size:12px;font-weight:700;color:var(--ink);text-align:center;line-height:1.4}
+.gauge-sub{font-size:11px;color:var(--ink-dim);text-align:center}
+.timeline{display:flex;align-items:flex-start;gap:0;margin-top:22px;padding-bottom:8px}
+.tl{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.tl::after{content:"";position:absolute;top:21px;left:50%;width:100%;height:2px;background:var(--rule);z-index:0}
+.tl:last-child::after{display:none}
+.tl-node{width:42px;height:42px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;position:relative;z-index:1;flex-shrink:0}
+.tl-node svg{width:18px;height:18px;color:#fff}
+.tl-time{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--brand);margin-top:10px}
+.tl-title{font-family:var(--display);font-weight:800;font-size:15px;color:var(--ink);margin-top:5px;text-align:center;line-height:1.25;padding:0 6px}
+.tl-desc{font-size:11px;color:var(--ink-soft);font-weight:500;margin-top:4px;text-align:center;line-height:1.4;padding:0 8px}
+.tl-arr{flex:0;width:34px;display:flex;align-items:flex-start;padding-top:10px}
+.stat-row{display:flex;gap:18px;margin-top:16px}
+.stat{flex:1;background:var(--bg);border:1px solid var(--rule);border-top:4px solid var(--brand);border-radius:6px;padding:20px 22px;box-shadow:0 8px 22px rgba(15,27,45,.05)}
+.stat .num{font-family:var(--display);font-weight:900;font-size:42px;line-height:1;color:var(--brand);letter-spacing:-.02em}
+.stat .num small{font-size:17px;font-weight:800;margin-left:2px}
+.stat .lab{font-size:13px;font-weight:700;color:var(--ink);margin-top:8px}
+.stat .sub{font-size:11px;color:var(--ink-dim);margin-top:4px;line-height:1.45}
+.callout{background:var(--paper-tint);border-left:6px solid var(--brand);border-radius:0 6px 6px 0;padding:20px 26px;margin-top:16px;max-width:1100px}
+.callout .t{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin-bottom:9px}
+.callout p{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.44;color:var(--ink)}
+.contact{display:flex;gap:32px;margin-top:16px;font-size:14px;color:var(--ink-soft);font-weight:500}
+.contact b{color:var(--brand);font-weight:800;display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.step-bar{display:flex;gap:8px;margin-top:16px}
+.step-item{flex:1;background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:12px 14px;position:relative;overflow:hidden}
+.step-item::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--brand)}
+.step-n{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--brand);line-height:1}
+.step-title{font-family:var(--display);font-weight:800;font-size:13px;color:var(--ink);margin-top:4px}
+.step-dur{font-size:10px;font-weight:700;color:var(--brand-2);letter-spacing:.04em;margin-top:6px}
+.phase-bar-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.pb-row{display:flex;align-items:center;gap:12px}
+.pb-label{font-size:13px;font-weight:700;color:var(--ink);min-width:110px;text-align:right}
+.pb-track{flex:1;height:22px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.pb-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px}
+.pb-fill span{font-size:11px;font-weight:700;color:#fff;letter-spacing:.03em}
+</style>
+</head>
+<body>
+<span class="cap">org-slide · 프리셋 ① knih (국립보건연구원) — 샘플 8p</span>
+<div class="stage">
+<div class="deck" id="deck">
+
+<!-- P1 COVER -->
+<section class="slide active" id="s1">
+  <header class="head"><span class="brand"><span class="mark"></span> 국립보건연구원 · 질병관리청</span><span class="chap">SEMINAR · 2026</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>연구자 역량강화 세미나</span>
+    <h1 class="title" data-anim>연구자를 위한<br>AI 활용</h1>
+    <p class="subtitle" data-anim>Claude Skills로 논문 리뷰·데이터 분석·기관 보고서를 <span class="hl">자동화</span>하다</p>
+    <p class="lede" data-anim>반복 업무는 AI에게, 판단과 해석은 연구자에게. 직무별 AI 스킬을 직접 만들어 연구 생산성을 높이는 실습 중심 세미나입니다.</p>
+    <div class="cover-meta" data-anim>
+      <div><div class="k">일시</div><div class="v">2026. 05. 26 (월)<small>14:00 – 17:00</small></div></div>
+      <div><div class="k">장소</div><div class="v">국립보건연구원<small>대강당 (본관 1F)</small></div></div>
+      <div><div class="k">주관</div><div class="v">국립보건연구원<small>연구기획조정과</small></div></div>
+      <div><div class="k">대상</div><div class="v">연구직·보건연구사<small>60명 (사전 신청)</small></div></div>
+    </div>
+  </div>
+  <footer class="foot"><span>연구자를 위한 AI 활용 · 2026.05.26</span><span class="pg">01 / 08</span></footer>
+</section>
+
+<!-- P2 AGENDA — 인포그래픽: 번호 리스트 + 스텝 진행 바 -->
+<section class="slide" id="s2">
+  <header class="head"><span class="brand"><span class="mark"></span> 국립보건연구원 · 질병관리청</span><span class="chap">AGENDA</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>AGENDA</span>
+    <h2 class="section-h" data-anim>오늘의 3가지 질문</h2>
+    <div class="agenda-list" data-anim>
+      <div class="agenda-item"><span class="agenda-num">01</span><div><div class="agenda-title">우리는 시간을 어디에 쓰는가</div><div class="agenda-desc">연구자 하루의 실제 시간 분포를 들여다보고, 반복·정형 업무의 비중을 파악합니다.</div><div class="agenda-stat"><span class="ag-badge">DATA · 현황</span><span class="ag-badge">14:00 – 14:30</span></div></div></div>
+      <div class="agenda-item"><span class="agenda-num">02</span><div><div class="agenda-title">무엇을 AI에 맡길 수 있나</div><div class="agenda-desc">논문 리뷰부터 보고서 초안까지, AI가 대신할 수 있는 5가지 직무 유형을 정의합니다.</div><div class="agenda-stat"><span class="ag-badge">SKILLS · 설계</span><span class="ag-badge">14:30 – 15:30</span></div></div></div>
+      <div class="agenda-item"><span class="agenda-num">03</span><div><div class="agenda-title">안전하게 쓰려면 무엇을 지켜야 하나</div><div class="agenda-desc">공공기관 데이터 보호 4원칙 — 민감정보를 AI에 입력하기 전 반드시 알아야 할 규칙.</div><div class="agenda-stat"><span class="ag-badge">SAFETY · 필수</span><span class="ag-badge">15:30 – 17:00</span></div></div></div>
+    </div>
+    <!-- 미니 진행 스텝 바 -->
+    <div class="step-bar" data-anim>
+      <div class="step-item"><div class="step-n">01</div><div class="step-title">현황 파악</div><div class="step-dur">30분</div></div>
+      <div class="step-item"><div class="step-n">02</div><div class="step-title">스킬 설계</div><div class="step-dur">60분</div></div>
+      <div class="step-item"><div class="step-n">03</div><div class="step-title">실습·검증</div><div class="step-dur">60분</div></div>
+      <div class="step-item"><div class="step-n">04</div><div class="step-title">결과 공유</div><div class="step-dur">30분</div></div>
+    </div>
+  </div>
+  <footer class="foot"><span>연구자를 위한 AI 활용 · 2026.05.26</span><span class="pg">02 / 08</span></footer>
+</section>
+
+<!-- P3 현황 — Chart 1: 도넛 + 도넛 범례 인포그래픽 -->
+<section class="slide" id="s3">
+  <header class="head"><span class="brand"><span class="mark"></span> 국립보건연구원 · 질병관리청</span><span class="chap">CURRENT STATE · 01</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>현황 분석</span>
+    <h2 class="section-h" data-anim>연구자 주당 업무 시간 분포</h2>
+    <div class="donut-wrap" data-anim>
+      <div class="donut-chart-box"><canvas id="donutChart"></canvas></div>
+      <div style="flex:1">
+        <div class="dl-item"><span class="dl-dot" style="background:#003764"></span>문헌조사<span class="dl-pct">30%</span></div>
+        <div class="dl-item"><span class="dl-dot" style="background:#1E5BA8"></span>데이터 정리·분석<span class="dl-pct">25%</span></div>
+        <div class="dl-item"><span class="dl-dot" style="background:#4F86C6"></span>보고서 작성<span class="dl-pct">20%</span></div>
+        <div class="dl-item"><span class="dl-dot" style="background:#9BB8DE"></span>회의·행정<span class="dl-pct">15%</span></div>
+        <div class="dl-item"><span class="dl-dot" style="background:#E4032E"></span>연구 설계<span class="dl-pct">10%</span></div>
+        <div style="margin-top:16px;padding:10px 14px;background:var(--brand-soft);border-radius:6px">
+          <div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-2);margin-bottom:4px">AI 자동화 가능 구간</div>
+          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--brand)">75%<span style="font-size:13px;font-weight:600;color:var(--ink-soft);margin-left:6px">반복·정형 업무</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="so-what" data-anim>시간의 약 75%가 반복·정형 업무 — 여기가 AI가 들어갈 자리입니다. <span style="color:var(--ink-dim);font-weight:500">(예시 데이터)</span></p>
+  </div>
+  <footer class="foot"><span>연구자를 위한 AI 활용 · 2026.05.26</span><span class="pg">03 / 08</span></footer>
+</section>
+
+<!-- P4 5 SKILLS — 인포그래픽: 아이콘 그리드 -->
+<section class="slide" id="s4">
+  <header class="head"><span class="brand"><span class="mark"></span> 국립보건연구원 · 질병관리청</span><span class="chap">5 SKILLS</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>5 SKILLS</span>
+    <h2 class="section-h" data-anim>5개 직무별 AI 스킬</h2>
+    <p class="lede" data-anim style="margin-top:6px;font-size:15px">연구 현장에서 가장 시간이 많이 드는 다섯 가지 업무, 각각에 맞춤 AI 스킬을 만들어 봅니다.</p>
+    <div class="icongrid" data-anim>
+      <div class="ic"><span class="ic-num">01</span><svg class="ic-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="5" width="22" height="30" rx="2"/><line x1="12" y1="13" x2="24" y2="13"/><line x1="12" y1="18" x2="24" y2="18"/><line x1="12" y1="23" x2="20" y2="23"/><circle cx="30" cy="30" r="4.5"/><line x1="33" y1="33" x2="37" y2="37"/></svg><h4>논문 리뷰어</h4><span class="tag">Literature</span><p>핵심 논지·방법·한계를 구조화 요약하고 인용 정리.</p></div>
+      <div class="ic"><span class="ic-num">02</span><svg class="ic-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="30" height="30" rx="2"/><polyline points="10,28 16,20 22,24 28,14"/><circle cx="28" cy="14" r="2" fill="currentColor" stroke="none"/></svg><h4>데이터 분석가</h4><span class="tag">Analysis</span><p>코호트 데이터 기초 통계·시각화 초안을 자동 생성.</p></div>
+      <div class="ic"><span class="ic-num">03</span><svg class="ic-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="4" width="24" height="32" rx="2"/><line x1="13" y1="12" x2="27" y2="12"/><line x1="13" y1="17" x2="27" y2="17"/><line x1="13" y1="22" x2="22" y2="22"/></svg><h4>기관 보고서</h4><span class="tag">Report</span><p>표준 양식에 맞춘 결과 보고서 초안을 일관 톤으로.</p></div>
+      <div class="ic"><span class="ic-num">04</span><svg class="ic-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4C12 4 6 9 6 16c0 6 4 10 10 11l-2 9 8-6c9-2 12-8 12-14C34 9 28 4 20 4Z"/><line x1="14" y1="15" x2="26" y2="15"/><line x1="14" y1="20" x2="22" y2="20"/></svg><h4>회의록 정리자</h4><span class="tag">Minutes</span><p>녹취·메모에서 결정사항·후속 과제를 자동 추출.</p></div>
+      <div class="ic"><span class="ic-num">05</span><svg class="ic-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="20" r="15"/><polyline points="13,20 18,25 27,14"/></svg><h4>통계 검증자</h4><span class="tag">Validation</span><p>가정·검정 절차를 점검하고 오류를 표시.</p></div>
+    </div>
+    <!-- 보조: AI 활용 가능성 게이지 미니 -->
+    <div style="display:flex;gap:10px;margin-top:14px" data-anim>
+      <div style="flex:1;background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;font-weight:700;color:var(--ink)">스킬 구축 난이도</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="width:60px;height:7px;background:var(--brand);border-radius:4px;display:block"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--brand-2)">입문 가능</span>
+        </div>
+      </div>
+      <div style="flex:1;background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;font-weight:700;color:var(--ink)">오늘 실습 스킬 수</span>
+        <span style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--brand)">1<span style="font-size:12px;color:var(--ink-dim);font-weight:600"> / 5</span></span>
+      </div>
+      <div style="flex:1;background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;font-weight:700;color:var(--ink)">코딩 필요 여부</span>
+        <span style="font-size:11px;font-weight:800;color:#fff;background:#1E5BA8;padding:3px 10px;border-radius:20px">불필요</span>
+      </div>
+    </div>
+  </div>
+  <footer class="foot"><span>연구자를 위한 AI 활용 · 2026.05.26</span><span class="pg">04 / 08</span></footer>
+</section>
+
+<!-- P5 효과 비교 — Chart 2: 그룹 막대 -->
+<section class="slide" id="s5">
+  <header class="head"><span class="brand"><span class="mark"></span> 국립보건연구원 · 질병관리청</span><span class="chap">DATA · 02</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>효과 비교</span>
+    <h2 class="section-h" data-anim>도입 전후 업무 소요시간 비교</h2>
+    <div class="bar-wrap" data-anim><canvas id="barChart"></canvas></div>
+    <p class="so-what" data-anim>평균 약 65% 시간 절감 — 오늘 실습의 목표치입니다. <span style="color:var(--ink-dim);font-weight:500">(예시 데이터)</span></p>
+  </div>
+  <footer class="foot"><span>연구자를 위한 AI 활용 · 2026.05.26</span><span class="pg">05 / 08</span></footer>
+</section>
+
+<!-- P6 SAFETY — 인포그래픽: 4카드 + 게이지 + Chart 3: 가로 막대(연구단계별 AI 활용 가능성) -->
+<section class="slide" id="s6">
+  <header class="head"><span class="brand"><span class="mark"></span> 국립보건연구원 · 질병관리청</span><span class="chap">SAFETY + INSIGHT</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>SAFETY</span>
+    <h2 class="section-h" data-anim>민감정보 비식별화 4원칙</h2>
+    <div style="display:flex;gap:24px;align-items:flex-start;margin-top:14px" data-anim>
+      <!-- 왼쪽: 4카드 -->
+      <div style="flex:1.4">
+        <div class="safety-cards">
+          <div class="sc"><svg class="sc-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="11" r="6"/><path d="M6 30c0-7 24-7 24 0"/><line x1="23" y1="8" x2="29" y2="5"/></svg><div><span class="sc-title">가명처리</span><span class="sc-desc">개인 식별정보를 가명으로 대체. 이름·주민번호·연락처 직접 입력 금지.</span><span class="rbadge">REQUIRED</span></div></div>
+          <div class="sc"><svg class="sc-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="26" height="26" rx="2"/><line x1="5" y1="14" x2="31" y2="14"/><line x1="14" y1="5" x2="14" y2="31"/><line x1="10" y1="22" x2="10" y2="27"/><line x1="20" y1="18" x2="20" y2="27"/><line x1="26" y1="20" x2="26" y2="27"/></svg><div><span class="sc-title">총계처리</span><span class="sc-desc">개별 값 대신 합계·평균·비율 등 집계 수치만 사용.</span><span class="rbadge">REQUIRED</span></div></div>
+          <div class="sc"><svg class="sc-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="8,10 28,10"/><path d="M14 10V7h8v3"/><rect x="11" y="10" width="14" height="18" rx="2"/><line x1="16" y1="15" x2="16" y2="24"/><line x1="20" y1="15" x2="20" y2="24"/></svg><div><span class="sc-title">데이터 삭제</span><span class="sc-desc">분석에 불필요한 식별 칼럼을 AI 입력 전 미리 제거.</span><span class="rbadge">REQUIRED</span></div></div>
+          <div class="sc"><svg class="sc-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="11" height="11" rx="2"/><rect x="20" y="5" width="11" height="11" rx="2"/><rect x="5" y="20" width="11" height="11" rx="2"/><rect x="20" y="20" width="11" height="11" rx="2"/></svg><div><span class="sc-title">범주화</span><span class="sc-desc">연속 수치(나이·소득 등)를 구간·범주로 변환하여 재식별 방지.</span><span class="rbadge">REQUIRED</span></div></div>
+        </div>
+      </div>
+      <!-- 오른쪽: 게이지 + 인사이트 차트 -->
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:300px">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="gauge-wrap" style="padding:16px 20px">
+            <div class="gauge"><div class="gauge-inner"><span class="gauge-num">4/4</span><span class="gauge-unit">원칙</span></div></div>
+            <span class="gauge-label">비식별화<br>적용 원칙</span>
+            <span class="gauge-sub">AI 입력 전 필수</span>
+          </div>
+          <div style="flex:1;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:14px 16px">
+            <div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-2);margin-bottom:8px">연구단계별 AI 활용 가능성</div>
+            <div class="phase-bar-list" id="phaseBarList">
+              <div class="pb-row"><span class="pb-label">문헌 검토</span><div class="pb-track"><div class="pb-fill" style="width:90%;background:#003764"><span>90%</span></div></div></div>
+              <div class="pb-row"><span class="pb-label">데이터 전처리</span><div class="pb-track"><div class="pb-fill" style="width:80%;background:#1E5BA8"><span>80%</span></div></div></div>
+              <div class="pb-row"><span class="pb-label">통계 분석</span><div class="pb-track"><div class="pb-fill" style="width:65%;background:#4F86C6"><span>65%</span></div></div></div>
+              <div class="pb-row"><span class="pb-label">보고서 작성</span><div class="pb-track"><div class="pb-fill" style="width:85%;background:#003764"><span>85%</span></div></div></div>
+              <div class="pb-row"><span class="pb-label">연구 설계</span><div class="pb-track"><div class="pb-fill" style="width:30%;background:#9BB8DE"><span>30%</span></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="foot"><span>연구자를 위한 AI 활용 · 2026.05.26</span><span class="pg">06 / 08</span></footer>
+</section>
+
+<!-- P7 TODAY — 인포그래픽: 타임라인 + Chart 3: 라인(연간 AI 도입 추세) -->
+<section class="slide" id="s7">
+  <header class="head"><span class="brand"><span class="mark"></span> 국립보건연구원 · 질병관리청</span><span class="chap">TODAY + TREND</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>TODAY</span>
+    <h2 class="section-h" data-anim>오늘의 실습 로드맵 &amp; AI 도입 추세</h2>
+    <div style="display:flex;gap:28px;align-items:flex-start;margin-top:10px">
+      <!-- 타임라인 -->
+      <div style="flex:1.1" data-anim>
+        <div class="timeline">
+          <div class="tl"><div class="tl-node"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8"/><polyline points="10,6 10,10 13,12"/></svg></div><span class="tl-time">14:00</span><span class="tl-title">오리엔테이션</span><span class="tl-desc">세미나 개요 및 3가지 질문 공유</span></div>
+          <div class="tl-arr"><svg width="34" height="22" viewBox="0 0 36 22" fill="none"><line x1="0" y1="11" x2="30" y2="11" stroke="#DBE1EA" stroke-width="2"/><polyline points="24,5 32,11 24,17" stroke="#DBE1EA" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="tl"><div class="tl-node" style="background:var(--brand-2)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2"/><line x1="7" y1="8" x2="13" y2="8"/><line x1="7" y1="11" x2="11" y2="11"/></svg></div><span class="tl-time">14:30</span><span class="tl-title">스킬 설계</span><span class="tl-desc">5가지 직무 유형 중 내 업무에 맞는 스킬 구조 설계</span></div>
+          <div class="tl-arr"><svg width="34" height="22" viewBox="0 0 36 22" fill="none"><line x1="0" y1="11" x2="30" y2="11" stroke="#DBE1EA" stroke-width="2"/><polyline points="24,5 32,11 24,17" stroke="#DBE1EA" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="tl"><div class="tl-node" style="background:var(--brand-2)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,10 8,14 16,6"/></svg></div><span class="tl-time">15:30</span><span class="tl-title">실습·검증</span><span class="tl-desc">Claude Skills로 내 스킬 직접 구현 및 결과물 검증</span></div>
+          <div class="tl-arr"><svg width="34" height="22" viewBox="0 0 36 22" fill="none"><line x1="0" y1="11" x2="30" y2="11" stroke="#DBE1EA" stroke-width="2"/><polyline points="24,5 32,11 24,17" stroke="#DBE1EA" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="tl"><div class="tl-node"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8" r="4"/><path d="M4 18c0-4 12-4 12 0"/><line x1="14" y1="5" x2="18" y2="3"/></svg></div><span class="tl-time">16:30</span><span class="tl-title">결과 공유</span><span class="tl-desc">참가자 발표 및 현장 피드백</span></div>
+        </div>
+      </div>
+      <!-- 라인 차트: 연간 AI 도입 추세 -->
+      <div style="flex:1;display:flex;flex-direction:column" data-anim>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-2);margin-bottom:6px">국내 공공기관 AI 도입률 추세</div>
+        <div style="height:200px;position:relative"><canvas id="lineChart"></canvas></div>
+        <p style="font-size:11px;font-weight:600;color:var(--brand);margin-top:8px;padding:8px 12px;background:var(--brand-soft);border-left:3px solid var(--brand);border-radius:0 4px 4px 0">2026년 도입률 42% — 공공부문 AI 전환의 골든타임입니다. <span style="color:var(--ink-dim);font-weight:500">(예시)</span></p>
+      </div>
+    </div>
+  </div>
+  <footer class="foot"><span>연구자를 위한 AI 활용 · 2026.05.26</span><span class="pg">07 / 08</span></footer>
+</section>
+
+<!-- P8 CLOSING — Stat Row + Callout + contact -->
+<section class="slide" id="s8">
+  <header class="head"><span class="brand"><span class="mark"></span> 국립보건연구원 · 질병관리청</span><span class="chap">CLOSING</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>오늘의 핵심 숫자</span>
+    <div class="stat-row" data-anim>
+      <div class="stat"><div class="num">8<small>분</small></div><div class="lab">논문 1편 리뷰</div><div class="sub">기존 25분 → AI 스킬 적용 후 목표치</div></div>
+      <div class="stat"><div class="num">65<small>%</small></div><div class="lab">시간 절감</div><div class="sub">반복·정형 업무 대비 평균 절감 (실습 목표·예시)</div></div>
+      <div class="stat"><div class="num">4<small>원칙</small></div><div class="lab">비식별화 필수 체크</div><div class="sub">가명처리·총계처리·삭제·범주화</div></div>
+    </div>
+    <div class="callout" data-anim>
+      <div class="t">오늘 가져가실 것</div>
+      <p>실습이 끝나면 <span class="hl">내 업무에 맞춘 AI 스킬 1개</span>를 직접 손에 쥐고 돌아갑니다.</p>
+    </div>
+    <div class="contact" data-anim>
+      <div><b>문의</b>연구기획조정과 · 043-000-0000</div>
+      <div><b>실습 자료</b>사내 포털 &gt; 세미나 &gt; 2026-AI</div>
+    </div>
+  </div>
+  <footer class="foot"><span>연구자를 위한 AI 활용 · 2026.05.26</span><span class="pg">08 / 08</span></footer>
+</section>
+
+</div><!-- /.deck -->
+</div><!-- /.stage -->
+
+<nav class="deck-nav">
+  <button id="prev" aria-label="이전">‹</button>
+  <span class="ind" id="ind">1 / 8</span>
+  <button id="next" aria-label="다음">›</button>
+</nav>
+
+<script>
+const deck=document.getElementById('deck');
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.94;deck.style.transform=`scale(${s})`;}
+addEventListener('resize',fit);fit();
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+const ind=document.getElementById('ind');
+function reveal(s){if(window.gsap)gsap.fromTo(s.querySelectorAll('[data-anim]'),{opacity:0,y:18},{opacity:1,y:0,duration:.5,stagger:.05,ease:'power2.out'});}
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('active',k===i));ind.textContent=`${i+1} / ${slides.length}`;reveal(slides[i]);}
+document.getElementById('next').onclick=()=>show(i+1);
+document.getElementById('prev').onclick=()=>show(i-1);
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();show(i+1);}if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(i-1);}});
+if(window.Chart){
+  Chart.defaults.font.family='Pretendard,"Noto Sans KR",sans-serif';Chart.defaults.font.weight=500;Chart.defaults.color='#3A4A60';Chart.defaults.plugins.legend.labels.usePointStyle=true;Chart.defaults.plugins.legend.labels.boxWidth=8;
+  new Chart(document.getElementById('donutChart'),{type:'doughnut',data:{labels:['문헌조사','데이터 정리·분석','보고서 작성','회의·행정','연구 설계'],datasets:[{data:[30,25,20,15,10],backgroundColor:['#003764','#1E5BA8','#4F86C6','#9BB8DE','#E4032E'],borderWidth:0,borderRadius:4,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return' '+c.label+': '+c.raw+'%'}}}}}});
+  new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:['논문 1편 리뷰','보고서 초안','회의록 정리','통계 검증'],datasets:[{label:'도입 전 (분)',data:[25,60,40,35],backgroundColor:'#9BB8DE',borderRadius:6,borderSkipped:false},{label:'도입 후 (분)',data:[8,18,10,14],backgroundColor:'#003764',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false},border:{color:'#DBE1EA'},ticks:{font:{size:13,weight:600}}},y:{grid:{color:'#DBE1EA'},border:{dash:[4,4],color:'transparent'},ticks:{font:{size:12},callback:function(v){return v+'분'}},beginAtZero:true}},plugins:{legend:{position:'top',align:'end',labels:{font:{size:13,weight:600},padding:18}},tooltip:{callbacks:{label:function(c){return' '+c.dataset.label+': '+c.raw+'분'}}}}}});
+  new Chart(document.getElementById('lineChart'),{type:'line',data:{labels:['2021','2022','2023','2024','2025','2026(예)'],datasets:[{label:'AI 도입률 (%)',data:[8,14,21,30,38,42],borderColor:'#003764',backgroundColor:'rgba(0,55,100,.10)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#003764',pointBorderColor:'#fff',pointBorderWidth:2,fill:true,tension:.35}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false},border:{color:'#DBE1EA'},ticks:{font:{size:12,weight:600}}},y:{grid:{color:'#DBE1EA'},border:{dash:[4,4],color:'transparent'},ticks:{font:{size:11},callback:function(v){return v+'%'}},beginAtZero:true,max:50}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return' AI 도입률: '+c.raw+'%'}}}}}});
+}
+show(0);
+</script>
+<script>
+/* 전체화면 (F키 / ⛶ 버튼) — org-slide deck */
+(function(){var nav=document.querySelector('.deck-nav');if(!nav)return;
+ var b=document.createElement('button');b.id='fs';b.setAttribute('aria-label','전체화면');b.title='전체화면 (F)';b.textContent='⛶';nav.appendChild(b);
+ function tg(){var d=document,el=d.documentElement;
+  if(!d.fullscreenElement&&!d.webkitFullscreenElement){(el.requestFullscreen||el.webkitRequestFullscreen).call(el);}
+  else{(d.exitFullscreen||d.webkitExitFullscreen).call(d);}}
+ b.onclick=tg;
+ addEventListener('keydown',function(e){if(e.key==='f'||e.key==='F'){e.preventDefault();tg();}});
+ var rs=function(){setTimeout(function(){dispatchEvent(new Event('resize'));},60);};
+ document.addEventListener('fullscreenchange',rs);document.addEventListener('webkitfullscreenchange',rs);
+})();
+</script>
+</body>
+</html>

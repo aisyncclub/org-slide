@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>org-slide · BASE (deck viewer)</title>
+
+<!-- 공통 폰트 + 차트 (CDN · 자립형) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<style>
+/* ── 프리셋 토큰 주입 (presets/{knih|mice}.md). 아래는 knih 예시 ── */
+:root{
+  --bg:#FFFFFF; --surface:#F4F6F9; --surface-2:#EAEEF4;
+  --ink:#0F1B2D; --ink-soft:#3A4A60; --ink-dim:#6B7888;
+  --brand:#003764; --brand-2:#1E5BA8; --brand-soft:#DDE7F2;
+  --accent:#E4032E; --rule:#DBE1EA; --hl:#CFE0F2;
+  --display:"Noto Sans KR","Pretendard Variable",Pretendard,sans-serif;
+  --sans:"Pretendard Variable",Pretendard,"Noto Sans KR",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --pad:64px 80px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:#0B0E14;font-family:var(--sans);color:var(--ink);
+  word-break:keep-all;overflow-wrap:break-word;overflow:hidden}
+
+/* 무대: 화면 중앙에 deck를 두고 창 크기에 맞게 스케일 */
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.deck{position:relative;width:1280px;height:720px;transform-origin:center center}
+
+/* 슬라이드: 한 번에 1장(active)만 표시 — PPT처럼 화살표로 이동 */
+.slide{position:absolute;inset:0;background:var(--bg);overflow:hidden;
+  opacity:0;visibility:hidden;transition:opacity .45s ease;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.slide.active{opacity:1;visibility:visible}
+
+/* 본문은 세로 중앙 정렬 (콘텐츠가 위로 쏠리지 않게) */
+.body{position:absolute;inset:0;padding:var(--pad);display:flex;flex-direction:column;justify-content:center}
+.head{position:absolute;top:32px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:4}
+.foot{position:absolute;bottom:30px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:4}
+.hl{color:var(--brand);font-weight:800;background:linear-gradient(transparent 60%,var(--hl) 60%);padding:0 4px}
+
+/* 네비게이션 바 (PPT식) */
+.deck-nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;
+  z-index:60;background:rgba(18,22,32,.74);backdrop-filter:blur(10px);padding:7px 12px;border-radius:40px;
+  box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.deck-nav button{width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;font-size:18px;
+  background:rgba(255,255,255,.12);color:#fff;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.deck-nav button:hover{background:rgba(255,255,255,.26)}
+.deck-nav .ind{color:#fff;font-family:var(--mono);font-size:13px;min-width:56px;text-align:center;letter-spacing:.05em}
+.cap{position:fixed;top:14px;left:18px;z-index:60;color:rgba(255,255,255,.5);font-size:12px;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<span class="cap">org-slide · BASE</span>
+<div class="stage">
+  <div class="deck" id="deck">
+    <!-- design-system.md §3 컴포넌트로 채운 .slide 들. 첫 장에 active -->
+    <section class="slide active">
+      <header class="head"><span>기관명</span><span>SECTION · 01</span></header>
+      <div class="body"><p data-anim>여기에 Cover / KPI / Chart / 인포그래픽 조합.</p></div>
+      <footer class="foot"><span>행사명 · 일자</span><span>01 / 08</span></footer>
+    </section>
+  </div>
+</div>
+<nav class="deck-nav">
+  <button id="prev" aria-label="이전">‹</button>
+  <span class="ind" id="ind">1 / 1</span>
+  <button id="next" aria-label="다음">›</button>
+  <button id="fs" aria-label="전체화면" title="전체화면 (F)">⛶</button>
+</nav>
+
+<script>
+/* deck 스케일: 창 크기에 맞춰 1280×720 비율 유지 */
+const deck=document.getElementById('deck');
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.94;deck.style.transform=`scale(${s})`;}
+addEventListener('resize',fit);fit();
+
+/* 슬라이드 네비게이션: ← → / Space / 버튼 */
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+const ind=document.getElementById('ind');
+function reveal(s){if(window.gsap)gsap.fromTo(s.querySelectorAll('[data-anim]'),
+  {opacity:0,y:18},{opacity:1,y:0,duration:.5,stagger:.05,ease:'power2.out'});}
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  ind.textContent=`${i+1} / ${slides.length}`;reveal(slides[i]);}
+document.getElementById('next').onclick=()=>show(i+1);
+document.getElementById('prev').onclick=()=>show(i-1);
+
+/* 전체화면 (F키 / ⛶ 버튼) */
+function toggleFS(){const d=document;const el=d.documentElement;
+  if(!d.fullscreenElement&&!d.webkitFullscreenElement){(el.requestFullscreen||el.webkitRequestFullscreen).call(el);}
+  else{(d.exitFullscreen||d.webkitExitFullscreen).call(d);}}
+document.getElementById('fs').onclick=toggleFS;
+document.addEventListener('fullscreenchange',()=>setTimeout(fit,60));
+document.addEventListener('webkitfullscreenchange',()=>setTimeout(fit,60));
+
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();show(i+1);}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(i-1);}
+  if(e.key==='f'||e.key==='F'){e.preventDefault();toggleFS();}});
+show(0);
+
+/* 차트는 여기서 전부 init (슬라이드는 opacity로만 숨기므로 캔버스 레이아웃 유지됨) */
+/* if(window.Chart){ Chart.defaults.font.family='Pretendard,sans-serif'; … new Chart(...) } */
+</script>
+</body>
+</html>

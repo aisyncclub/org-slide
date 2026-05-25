@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MICE 임직원 · org-slide(mice 라이트) 샘플</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#FFFFFF;--bg-2:#F5F7FC;--surface-2:#F2F5FB;--glass-brd:#E2E7F0;--ink:#16203A;--ink-soft:#41506B;--ink-dim:#7A88A6;--brand:#0094B3;--accent:#D81E74;--accent-2:#C8922F;--rule:#E2E7F0;--hl:rgba(0,148,179,.16);--display:"Montserrat","Pretendard Variable",Pretendard,sans-serif;--sans:"Pretendard Variable",Pretendard,"Noto Sans KR",sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace;--pad:56px 80px}
+*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%}
+body{background:#1A1E2A;font-family:var(--sans);color:var(--ink);word-break:keep-all;overflow-wrap:break-word;overflow:hidden}
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.deck{position:relative;width:1280px;height:720px;transform-origin:center center}
+.slide{position:absolute;inset:0;background:var(--bg);overflow:hidden;opacity:0;visibility:hidden;transition:opacity .4s ease;box-shadow:0 30px 80px rgba(0,0,0,.45);isolation:isolate}
+.slide.active{opacity:1;visibility:visible}
+.slide::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--brand);z-index:6}
+.slide::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:rgba(0,148,179,.08);top:-200px;right:-140px;z-index:0}
+.head{position:absolute;top:28px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.foot{position:absolute;bottom:24px;left:80px;right:80px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;color:var(--ink-dim);z-index:5;border-top:1px solid var(--rule);padding-top:10px}
+.foot .pg{font-family:var(--mono);letter-spacing:.06em}
+.body{position:absolute;inset:0;padding:var(--pad);display:flex;flex-direction:column;justify-content:center;z-index:2}
+.body.top{justify-content:flex-start;padding-top:78px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:14px;letter-spacing:.04em;color:var(--ink-soft)}
+.node{width:11px;height:11px;border-radius:50%;background:var(--brand);flex-shrink:0;box-shadow:0 0 0 3px rgba(0,148,179,.18)}
+.chap{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--brand)}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--brand);margin-bottom:16px}
+.eyebrow::before{content:"";width:28px;height:2px;background:var(--brand)}
+.kicker-en{font-family:var(--display);font-weight:900;font-size:96px;line-height:.9;letter-spacing:-.02em;color:var(--brand);margin-bottom:8px}
+.title-ko{font-family:var(--sans);font-weight:800;font-size:34px;line-height:1.3;color:var(--ink);max-width:860px}
+.lede{font-size:16px;line-height:1.66;color:var(--ink-soft);max-width:800px;margin-top:14px;font-weight:500}
+.hl{color:var(--brand);font-weight:800;background:var(--hl);padding:0 4px}
+h2.sh{font-family:var(--sans);font-weight:800;font-size:38px;line-height:1.14;letter-spacing:-.025em;color:var(--ink);margin-bottom:6px}
+h2.sh .g{color:var(--brand)}
+.meta-row{display:flex;margin-top:32px;border-top:1px solid var(--rule);padding-top:16px;max-width:940px}
+.meta-row div{padding-right:28px}.meta-row div+div{border-left:1px solid var(--rule);padding-left:28px}
+.meta-row .k{font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);margin-bottom:6px}
+.meta-row .v{font-weight:700;font-size:16px;color:var(--ink)}.meta-row .v small{display:block;font-weight:500;font-size:12px;color:var(--ink-dim);margin-top:3px}
+.ag-list{display:flex;flex-direction:column;gap:12px;margin-top:20px;max-width:860px}
+.ag-item{display:flex;align-items:center;gap:22px;padding:13px 20px;background:var(--surface-2);border:1px solid var(--glass-brd);border-radius:12px;box-shadow:0 2px 8px rgba(22,32,58,.05)}
+.ag-num{font-family:var(--display);font-weight:900;font-size:34px;line-height:1;color:var(--brand);min-width:48px;text-align:center}
+.ag-body h4{font-weight:800;font-size:17px;color:var(--ink);margin-bottom:3px}.ag-body p{font-size:13px;color:var(--ink-dim);line-height:1.5}
+.ag-tag{margin-left:auto;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--brand);background:rgba(0,148,179,.08);border:1px solid rgba(0,148,179,.22);border-radius:20px;padding:5px 12px;white-space:nowrap}
+.cw{position:relative;flex-shrink:0}
+.sw{display:inline-flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;font-weight:700;color:var(--ink-soft);background:rgba(0,148,179,.08);border:1px solid rgba(0,148,179,.20);border-radius:8px;padding:7px 14px}
+.sw::before{content:"So What";font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--brand);border-radius:4px;padding:2px 7px;flex-shrink:0}
+.mini-bar-group{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.mb{display:flex;align-items:center;gap:10px}.mb .ml{font-size:12px;font-weight:600;color:var(--ink-soft);min-width:88px;text-align:right}
+.mb .mt{flex:1;height:9px;background:var(--surface-2);border-radius:20px;overflow:hidden;border:1px solid var(--glass-brd)}
+.mb .mf{height:100%;border-radius:20px;background:var(--brand)}.mb .mv{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--brand);min-width:34px}
+.panel{background:var(--surface-2);border:1px solid var(--glass-brd);border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(22,32,58,.05)}
+.pt{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--brand);margin-bottom:10px}
+.timeline{display:grid;grid-template-columns:repeat(5,1fr);margin-top:32px;position:relative}
+.timeline::before{content:"";position:absolute;top:8px;left:7%;right:7%;height:2px;background:var(--brand)}
+.tl{padding:0 8px}.tl .dot{width:16px;height:16px;border-radius:50%;background:var(--brand);border:3px solid #fff;box-shadow:0 0 0 3px rgba(0,148,179,.22);position:relative;z-index:2;margin-bottom:14px}
+.tl .stp{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--brand);letter-spacing:.1em}
+.tl h4{font-weight:800;font-size:17px;color:var(--ink);margin-top:4px}.tl p{font-size:12px;line-height:1.5;color:var(--ink-dim);margin-top:5px}
+.gauge-row{display:flex;gap:18px;margin-top:14px;align-items:flex-end}
+.gi{display:flex;flex-direction:column;align-items:center;gap:6px}
+.gr{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative}
+.gr svg{position:absolute;inset:0;width:100%;height:100%}
+.gr .gv{position:relative;z-index:1;font-family:var(--display);font-weight:900;font-size:13px;color:var(--brand)}
+.gi .gl{font-size:11px;font-weight:700;color:var(--ink);text-align:center;max-width:72px;line-height:1.3}
+.donut-layout{display:grid;grid-template-columns:270px 1fr;gap:32px;margin-top:18px;align-items:center}
+.donut-wrap{position:relative;height:230px}
+.dl-legend{display:flex;flex-direction:column;gap:9px}
+.dl-item{display:flex;align-items:center;gap:12px;padding:11px 15px;background:var(--surface-2);border:1px solid var(--glass-brd);border-radius:10px}
+.dl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.dl-body .lbl{font-weight:700;font-size:13px;color:var(--ink)}.dl-body .sub{font-size:11px;color:var(--ink-dim);margin-top:1px}
+.dl-val{font-family:var(--display);font-weight:800;font-size:21px;color:var(--brand);margin-left:auto}
+.vc{padding:13px 17px;background:var(--surface-2);border:1px solid var(--glass-brd);border-left:4px solid var(--accent-2);border-radius:0 10px 10px 0;margin-top:9px}
+.vc .vn{font-family:var(--display);font-weight:900;font-size:34px;color:#C8922F;line-height:1}
+.vc .vl{font-weight:700;font-size:13px;color:var(--ink);margin-top:4px}.vc .vs{font-size:11px;color:var(--ink-dim);margin-top:2px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.stat{padding:18px 14px;background:var(--surface-2);border:1px solid var(--glass-brd);border-radius:12px;text-align:center}
+.stat .ic{margin:0 auto 9px;width:38px;height:38px;background:rgba(0,148,179,.10);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.stat .ic svg{width:19px;height:19px;stroke:var(--brand);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.stat .num{font-family:var(--display);font-weight:900;font-size:32px;line-height:1;color:var(--brand)}
+.stat .num small{font-size:14px;font-weight:700}.stat .lab{font-weight:700;font-size:13px;color:var(--ink);margin-top:6px}.stat .sub{font-size:11px;color:var(--ink-dim);margin-top:3px;line-height:1.4}
+.vs-row{display:grid;grid-template-columns:1fr auto 1fr;margin-top:14px;align-items:stretch}
+.vs-col{padding:18px 20px;border-radius:14px;border:1px solid var(--glass-brd)}
+.vs-col.before{background:#FDF5F8;border-color:rgba(216,30,116,.18)}.vs-col.after{background:#F0F8FB;border-color:rgba(0,148,179,.18)}
+.vs-lbl{font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:9px}
+.vs-col.before .vs-lbl{color:var(--accent)}.vs-col.after .vs-lbl{color:var(--brand)}
+.vs-sep{display:flex;align-items:center;justify-content:center;padding:0 10px;font-family:var(--display);font-weight:900;font-size:20px;color:var(--ink-dim)}
+.vsi{display:flex;align-items:flex-start;gap:7px;margin-bottom:8px;font-size:12px;color:var(--ink-soft);line-height:1.4}
+.vsi::before{content:"";width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.vs-col.before .vsi::before{background:var(--accent)}.vs-col.after .vsi::before{background:var(--brand)}
+.callout{background:var(--surface-2);border:1px solid var(--glass-brd);border-left:4px solid var(--brand);border-radius:0 12px 12px 0;padding:20px 26px;margin-top:20px;max-width:900px}
+.callout .ct{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--brand);margin-bottom:8px}
+.callout p{font-weight:700;font-size:20px;line-height:1.5;color:var(--ink)}
+.close-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.cstat{padding:16px 14px;background:var(--surface-2);border:1px solid var(--glass-brd);border-radius:12px;text-align:center}
+.cstat .cv{font-family:var(--display);font-weight:900;font-size:36px;line-height:1;color:var(--brand)}
+.cstat .cv small{font-size:15px;font-weight:800}.cstat .cl{font-weight:700;font-size:13px;color:var(--ink);margin-top:6px}.cstat .cs{font-size:11px;color:var(--ink-dim);margin-top:2px}
+.deck-nav{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;z-index:60;background:rgba(18,22,32,.80);backdrop-filter:blur(10px);padding:7px 12px;border-radius:40px;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.deck-nav button{width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;font-size:18px;background:rgba(255,255,255,.12);color:#fff;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.deck-nav button:hover{background:rgba(255,255,255,.26)}.deck-nav .ind{color:#fff;font-family:var(--mono);font-size:13px;min-width:56px;text-align:center;letter-spacing:.05em}
+.cap{position:fixed;top:14px;left:18px;z-index:60;color:rgba(255,255,255,.45);font-size:12px;letter-spacing:.04em}
+/* 인라인 보조 유틸 */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.g2-r{display:grid;grid-template-columns:1fr 220px;gap:26px;align-items:start}.g2{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+.badge{padding:13px 16px;background:var(--surface-2);border:1px solid var(--glass-brd);border-radius:10px;display:flex;align-items:center;gap:12px}
+.badge .bv{font-family:var(--display);font-weight:900;font-size:26px;color:var(--brand)}
+.badge .bl{font-size:12px;color:var(--ink-soft);font-weight:600;line-height:1.3}
+.act{padding:13px 15px;border-radius:10px;border:1px solid}
+.act .at{font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:7px}
+.act .ah{font-weight:800;font-size:14px;color:var(--ink);margin-bottom:4px}.act .as{font-size:12px;color:var(--ink-dim);line-height:1.4}
+</style>
+</head>
+<body>
+<span class="cap">org-slide · 프리셋 ② mice 라이트 — 샘플 8p</span>
+<div class="stage"><div class="deck" id="deck">
+
+<!-- P1 · COVER -->
+<section class="slide active" id="m1">
+  <header class="head"><span class="brand"><span class="node"></span> KOREA MICE · 임직원 세미나</span><span class="chap">KEYNOTE · 2026</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>Global Business Events</span>
+    <div class="kicker-en" data-anim>MICE TRENDS<br>2026</div>
+    <p class="title-ko" data-anim>하이브리드를 넘어, <span class="hl">몰입형 이벤트</span>로</p>
+    <p class="lede" data-anim>연결과 경험을 설계하는 시대. 국제회의·전시 운영의 다음 3년을 데이터로 읽고, 우리 행사에 적용할 전략을 함께 짚습니다.</p>
+    <div class="meta-row" data-anim>
+      <div><div class="k">Date</div><div class="v">2026. 06. 18 (목)<small>10:00 – 12:30</small></div></div>
+      <div><div class="k">Venue</div><div class="v">COEX Conference Room<small>3F, Hall E</small></div></div>
+      <div><div class="k">Audience</div><div class="v">기획·운영·마케팅<small>전 임직원</small></div></div>
+    </div>
+  </div>
+  <footer class="foot"><span>MICE TRENDS 2026 · Korea MICE</span><span class="pg">01 / 08</span></footer>
+</section>
+
+<!-- P2 · 아젠다 + 인포 스탯 3개 -->
+<section class="slide" id="m2">
+  <header class="head"><span class="brand"><span class="node"></span> KOREA MICE · 임직원 세미나</span><span class="chap">AGENDA</span></header>
+  <div class="body top">
+    <span class="eyebrow" data-anim>Today's Program</span>
+    <h2 class="sh" data-anim>오늘 <span class="g">3가지</span>를 가져가세요</h2>
+    <div class="ag-list" data-anim>
+      <div class="ag-item"><div class="ag-num">01</div><div class="ag-body"><h4>시장은 어디로</h4><p>글로벌 MICE 시장 성장세와 우리 업계가 주목해야 할 2026 핵심 트렌드</p></div><div class="ag-tag">MARKET</div></div>
+      <div class="ag-item"><div class="ag-num">02</div><div class="ag-body"><h4>운영 설계</h4><p>유치부터 사후관리까지 5단계 프레임워크와 행사 규모별 전략 분기</p></div><div class="ag-tag">OPERATION</div></div>
+      <div class="ag-item"><div class="ag-num">03</div><div class="ag-body"><h4>경험을 만드는 것</h4><p>참가자가 다시 찾게 만드는 4대 레버와 채널별 등록 전환 인사이트</p></div><div class="ag-tag">EXPERIENCE</div></div>
+    </div>
+    <div class="g3" style="margin-top:18px" data-anim>
+      <div class="badge" style="border-color:rgba(0,148,179,.22);background:rgba(0,148,179,.07)"><span class="bv">$105B</span><span class="bl">2032 시장<br>규모 전망</span></div>
+      <div class="badge" style="border-color:rgba(61,92,214,.22);background:rgba(61,92,214,.07)"><span class="bv" style="color:#3D5CD6">5단계</span><span class="bl">이벤트 운영<br>프레임워크</span></div>
+      <div class="badge" style="border-color:rgba(216,30,116,.22);background:rgba(216,30,116,.07)"><span class="bv" style="color:#D81E74">4대</span><span class="bl">참가자 경험<br>핵심 레버</span></div>
+    </div>
+  </div>
+  <footer class="foot"><span>MICE TRENDS 2026 · Korea MICE</span><span class="pg">02 / 08</span></footer>
+</section>
+
+<!-- P3 · 시장 성장 라인 + 지역 미니바 -->
+<section class="slide" id="m3">
+  <header class="head"><span class="brand"><span class="node"></span> KOREA MICE · 임직원 세미나</span><span class="chap">MARKET · 01</span></header>
+  <div class="body top">
+    <span class="eyebrow" data-anim>Global Market Size</span>
+    <h2 class="sh" data-anim>글로벌 MICE 시장, <span class="g">8년 새 약 2배</span></h2>
+    <div class="g2-r" data-anim>
+      <div>
+        <div class="cw" style="height:265px"><canvas id="chartLine"></canvas></div>
+        <div class="sw">2032년 $105B 돌파 전망 — 지금 역량을 쌓은 조직이 시장을 가져간다</div>
+      </div>
+      <div class="panel" style="margin-top:0">
+        <div class="pt">지역별 성장률 전망</div>
+        <div class="mini-bar-group">
+          <div class="mb"><span class="ml">아시아태평양</span><div class="mt"><div class="mf" style="width:88%"></div></div><span class="mv">+8.8%</span></div>
+          <div class="mb"><span class="ml">북미</span><div class="mt"><div class="mf" style="width:56%"></div></div><span class="mv">+5.6%</span></div>
+          <div class="mb"><span class="ml">유럽</span><div class="mt"><div class="mf" style="width:44%"></div></div><span class="mv">+4.4%</span></div>
+          <div class="mb"><span class="ml">중동·아프리카</span><div class="mt"><div class="mf" style="width:72%"></div></div><span class="mv">+7.2%</span></div>
+          <div class="mb"><span class="ml">남미</span><div class="mt"><div class="mf" style="width:38%"></div></div><span class="mv">+3.8%</span></div>
+        </div>
+        <div style="margin-top:11px;font-size:11px;color:var(--ink-dim)">CAGR 기준 / GDS Research 2026</div>
+      </div>
+    </div>
+  </div>
+  <footer class="foot"><span>MICE TRENDS 2026 · Korea MICE</span><span class="pg">03 / 08</span></footer>
+</section>
+
+<!-- P4 · 운영 5단계 타임라인 + 게이지 -->
+<section class="slide" id="m4">
+  <header class="head"><span class="brand"><span class="node"></span> KOREA MICE · 임직원 세미나</span><span class="chap">FRAMEWORK · 01</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>Event Lifecycle</span>
+    <h2 class="sh" data-anim>몰입형 이벤트 <span class="g">운영 5단계</span></h2>
+    <p class="lede" data-anim style="margin-top:6px;font-size:14px">유치부터 사후관리까지, 각 단계에서 <span class="hl">참가자 경험</span>을 끌어올리는 핵심 레버.</p>
+    <div class="timeline" data-anim>
+      <div class="tl"><div class="dot"></div><div class="stp">STEP 01</div><h4>유치</h4><p>데이터 기반 타깃 발굴과 제안서 작성.</p></div>
+      <div class="tl"><div class="dot" style="background:#3D5CD6;box-shadow:0 0 0 3px rgba(61,92,214,.20)"></div><div class="stp" style="color:#3D5CD6">STEP 02</div><h4>기획</h4><p>하이브리드 동선과 콘텐츠 시나리오 설계.</p></div>
+      <div class="tl"><div class="dot" style="background:#D81E74;box-shadow:0 0 0 3px rgba(216,30,116,.20)"></div><div class="stp" style="color:#D81E74">STEP 03</div><h4>마케팅</h4><p>채널별 등록 전환과 커뮤니티 형성.</p></div>
+      <div class="tl"><div class="dot" style="background:#C8922F;box-shadow:0 0 0 3px rgba(200,146,47,.20)"></div><div class="stp" style="color:#C8922F">STEP 04</div><h4>운영</h4><p>실시간 인터랙션 + AI 매칭 실행.</p></div>
+      <div class="tl"><div class="dot"></div><div class="stp">STEP 05</div><h4>사후관리</h4><p>참가 데이터 분석과 차기 행사 연결.</p></div>
+    </div>
+    <div data-anim style="margin-top:18px">
+      <div class="pt">단계별 참가자 만족도 기여도 (자체 조사)</div>
+      <div class="gauge-row">
+        <div class="gi"><div class="gr"><svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="29" fill="none" stroke="#E2E7F0" stroke-width="7"/><circle cx="35" cy="35" r="29" fill="none" stroke="#0094B3" stroke-width="7" stroke-dasharray="54.7 182.2" stroke-dashoffset="45.6" stroke-linecap="round" transform="rotate(-90 35 35)"/></svg><span class="gv">30%</span></div><span class="gl">유치·기획</span></div>
+        <div class="gi"><div class="gr"><svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="29" fill="none" stroke="#E2E7F0" stroke-width="7"/><circle cx="35" cy="35" r="29" fill="none" stroke="#3D5CD6" stroke-width="7" stroke-dasharray="36.4 182.2" stroke-dashoffset="45.6" stroke-linecap="round" transform="rotate(-90 35 35)"/></svg><span class="gv" style="color:#3D5CD6">20%</span></div><span class="gl">마케팅</span></div>
+        <div class="gi"><div class="gr"><svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="29" fill="none" stroke="#E2E7F0" stroke-width="7"/><circle cx="35" cy="35" r="29" fill="none" stroke="#D81E74" stroke-width="7" stroke-dasharray="72.9 182.2" stroke-dashoffset="45.6" stroke-linecap="round" transform="rotate(-90 35 35)"/></svg><span class="gv" style="color:#D81E74">40%</span></div><span class="gl">현장 운영</span></div>
+        <div class="gi"><div class="gr"><svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="29" fill="none" stroke="#E2E7F0" stroke-width="7"/><circle cx="35" cy="35" r="29" fill="none" stroke="#C8922F" stroke-width="7" stroke-dasharray="18.2 182.2" stroke-dashoffset="45.6" stroke-linecap="round" transform="rotate(-90 35 35)"/></svg><span class="gv" style="color:#C8922F">10%</span></div><span class="gl">사후관리</span></div>
+        <div style="flex:1;padding-left:14px;display:flex;flex-direction:column;justify-content:center"><div style="font-size:12px;color:var(--ink-soft);line-height:1.6"><span style="font-weight:700;color:var(--accent)">현장 운영(40%)</span>이 만족도의 핵심.<br>사후관리는 비중 낮지만 <span style="font-weight:700;color:var(--brand)">재참가율</span>에 직결.</div></div>
+      </div>
+    </div>
+  </div>
+  <footer class="foot"><span>MICE TRENDS 2026 · Korea MICE</span><span class="pg">04 / 08</span></footer>
+</section>
+
+<!-- P5 · 행사 규모 도넛 + 범례 -->
+<section class="slide" id="m5">
+  <header class="head"><span class="brand"><span class="node"></span> KOREA MICE · 임직원 세미나</span><span class="chap">MARKET · 02</span></header>
+  <div class="body top">
+    <span class="eyebrow" data-anim>Venue &amp; Scale Mix</span>
+    <h2 class="sh" data-anim>행사 규모·베뉴 <span class="g">구성</span></h2>
+    <div class="donut-layout" data-anim>
+      <div class="donut-wrap"><canvas id="chartDonut"></canvas></div>
+      <div>
+        <div class="dl-legend">
+          <div class="dl-item"><div class="dl-dot" style="background:#0094B3"></div><div class="dl-body"><div class="lbl">대형 행사 (100명+)</div><div class="sub">시장 매출의 절반 이상 점유</div></div><div class="dl-val">64%</div></div>
+          <div class="dl-item"><div class="dl-dot" style="background:#3D5CD6"></div><div class="dl-body"><div class="lbl">중형 행사 (30~99명)</div><div class="sub">성장세 가장 빠른 세그먼트</div></div><div class="dl-val" style="color:#3D5CD6">24%</div></div>
+          <div class="dl-item"><div class="dl-dot" style="background:#D81E74"></div><div class="dl-body"><div class="lbl">소형 행사 (~29명)</div><div class="sub">프리미엄화·체험 특화</div></div><div class="dl-val" style="color:#D81E74">12%</div></div>
+        </div>
+        <div class="vc"><div class="vn">32%</div><div class="vl">프리미엄 베뉴 점유율</div><div class="vs">5성·복합문화 통합형 행사 급증 — 장소가 아닌 경험이 선택 기준</div></div>
+      </div>
+    </div>
+    <div class="sw" data-anim>대형 행사가 시장을 주도하지만, 프리미엄 소형이 수익성에서 앞서기 시작</div>
+  </div>
+  <footer class="foot"><span>MICE TRENDS 2026 · Korea MICE</span><span class="pg">05 / 08</span></footer>
+</section>
+
+<!-- P6 · 경험 4대 레버 Stat + Before/After -->
+<section class="slide" id="m6">
+  <header class="head"><span class="brand"><span class="node"></span> KOREA MICE · 임직원 세미나</span><span class="chap">EXPERIENCE · 01</span></header>
+  <div class="body top">
+    <span class="eyebrow" data-anim>Experience Design</span>
+    <h2 class="sh" data-anim>참가자가 <span class="g">다시 찾게</span> 만드는 4대 레버</h2>
+    <div class="stat-row" data-anim>
+      <div class="stat"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div><div class="num">78<small>%</small></div><div class="lab">네트워킹 매칭</div><div class="sub">AI 매칭 도입 행사 재신청률</div></div>
+      <div class="stat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="num">2.4<small>×</small></div><div class="lab">실시간 인터랙션</div><div class="sub">라이브 Q&amp;A·폴링 만족도</div></div>
+      <div class="stat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="num">61<small>%</small></div><div class="lab">개인화 동선</div><div class="sub">맞춤 추천 수신자 완료율</div></div>
+      <div class="stat"><div class="ic"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="num">3.1<small>×</small></div><div class="lab">데이터 사후관리</div><div class="sub">리포트 공유 그룹 차기 전환</div></div>
+    </div>
+    <div class="vs-row" data-anim>
+      <div class="vs-col before"><div class="vs-lbl">Before — 전통 방식</div><div class="vsi">일방향 강연 위주 세션 구성</div><div class="vsi">무작위 명함 교환 네트워킹</div><div class="vsi">행사 종료 후 관계 단절</div><div class="vsi">정성 설문·수작업 결과 보고</div></div>
+      <div class="vs-sep">→</div>
+      <div class="vs-col after"><div class="vs-lbl">After — 몰입형 설계</div><div class="vsi">AI 기반 세션 맞춤 추천 + 라이브 폴</div><div class="vsi">관심사·직군 AI 매칭 네트워킹</div><div class="vsi">커뮤니티 플랫폼 연결 지속</div><div class="vsi">실시간 대시보드 + 자동 인사이트</div></div>
+    </div>
+  </div>
+  <footer class="foot"><span>MICE TRENDS 2026 · Korea MICE</span><span class="pg">06 / 08</span></footer>
+</section>
+
+<!-- P7 · 등록 전환 막대 + 재등록 스택 차트 -->
+<section class="slide" id="m7">
+  <header class="head"><span class="brand"><span class="node"></span> KOREA MICE · 임직원 세미나</span><span class="chap">EXPERIENCE · 02</span></header>
+  <div class="body top">
+    <span class="eyebrow" data-anim>Registration &amp; Retention</span>
+    <h2 class="sh" data-anim>채널별 등록 전환 — <span class="g">하이브리드가 앞선다</span></h2>
+    <div class="g2" data-anim>
+      <div>
+        <div class="cw" style="height:245px"><canvas id="chartBar"></canvas></div>
+        <div class="sw">하이브리드 지수 165 — 오프라인·온라인 단독 대비 40%p+ 우위</div>
+      </div>
+      <div>
+        <div class="pt">참가자 재등록 의향 (채널별 %)</div>
+        <div class="cw" style="height:200px"><canvas id="chartStacked"></canvas></div>
+        <div style="margin-top:9px;font-size:12px;color:var(--ink-dim);line-height:1.5">하이브리드 참가자의 <span style="font-weight:700;color:var(--brand)">82%</span>가 차기 행사 재등록 의향 표명 (2025 조사)</div>
+      </div>
+    </div>
+  </div>
+  <footer class="foot"><span>MICE TRENDS 2026 · Korea MICE</span><span class="pg">07 / 08</span></footer>
+</section>
+
+<!-- P8 · 마무리 + 액션 3개 -->
+<section class="slide" id="m8">
+  <header class="head"><span class="brand"><span class="node"></span> KOREA MICE · 임직원 세미나</span><span class="chap">CLOSING</span></header>
+  <div class="body">
+    <span class="eyebrow" data-anim>Key Takeaway</span>
+    <h2 class="sh" data-anim>설계된 경험이 <span class="g">시장을 만든다</span></h2>
+    <div class="callout" data-anim><div class="ct">핵심 메시지</div><p>규모가 커질수록 차이를 만드는 건 시설이 아니라 <span class="hl">설계된 경험</span>입니다.</p></div>
+    <div class="close-stats" data-anim>
+      <div class="cstat"><div class="cv">$105<small>B</small></div><div class="cl">2032 시장 전망</div><div class="cs">8년 새 약 2배 성장</div></div>
+      <div class="cstat"><div class="cv">4대</div><div class="cl">참가자 경험 레버</div><div class="cs">매칭·인터랙션·개인화·데이터</div></div>
+      <div class="cstat"><div class="cv">165</div><div class="cl">하이브리드 전환 지수</div><div class="cs">오프라인 100 대비 65p 우위</div></div>
+    </div>
+    <div class="g3" style="margin-top:14px" data-anim>
+      <div class="act" style="background:rgba(0,148,179,.07);border-color:rgba(0,148,179,.20)"><div class="at" style="color:var(--brand)">Action 01</div><div class="ah">AI 매칭 파일럿</div><div class="as">하반기 행사 1건에 네트워킹 AI 매칭 적용</div></div>
+      <div class="act" style="background:rgba(61,92,214,.07);border-color:rgba(61,92,214,.20)"><div class="at" style="color:#3D5CD6">Action 02</div><div class="ah">데이터 체계화</div><div class="as">참가자 행동 데이터 파이프라인 + 대시보드</div></div>
+      <div class="act" style="background:rgba(216,30,116,.07);border-color:rgba(216,30,116,.20)"><div class="at" style="color:var(--accent)">Action 03</div><div class="ah">하이브리드 전환</div><div class="as">오프라인 단독 행사 2건에 하이브리드 적용</div></div>
+    </div>
+  </div>
+  <footer class="foot"><span>MICE TRENDS 2026 · Korea MICE</span><span class="pg">08 / 08</span></footer>
+</section>
+
+</div></div>
+<nav class="deck-nav">
+  <button id="prev" aria-label="이전">‹</button>
+  <span class="ind" id="ind">1 / 8</span>
+  <button id="next" aria-label="다음">›</button>
+</nav>
+<script>
+const deck=document.getElementById('deck');
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*.94;deck.style.transform='scale('+s+')';}
+addEventListener('resize',fit);fit();
+const slides=[...document.querySelectorAll('.slide')];let idx=0;
+const indEl=document.getElementById('ind');
+function reveal(s){if(window.gsap)gsap.fromTo(s.querySelectorAll('[data-anim]'),{opacity:0,y:16},{opacity:1,y:0,duration:.5,stagger:.05,ease:'power2.out'});}
+function show(n){idx=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('active',k===idx));indEl.textContent=(idx+1)+' / '+slides.length;reveal(slides[idx]);}
+document.getElementById('next').onclick=()=>show(idx+1);
+document.getElementById('prev').onclick=()=>show(idx-1);
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();show(idx+1);}if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(idx-1);}});
+if(window.Chart){
+  Chart.defaults.font.family='Pretendard,sans-serif';Chart.defaults.color='#41506B';
+  Chart.defaults.plugins.legend.labels.usePointStyle=true;Chart.defaults.plugins.legend.labels.boxWidth=8;
+  (()=>{const c=document.getElementById('chartLine');if(!c)return;new Chart(c,{type:'line',data:{labels:['2024','2025','2026','2028','2030','2032'],datasets:[{label:'글로벌 MICE 시장 ($B)',data:[57,59,61,72,88,105],borderColor:'#0094B3',backgroundColor:'rgba(0,148,179,.12)',borderWidth:3,pointBackgroundColor:'#0094B3',pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:5,fill:true,tension:.35}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#16203A',titleColor:'#fff',bodyColor:'#C3CCE6',borderColor:'#E2E7F0',borderWidth:1,padding:10,callbacks:{label:c=>' $'+c.parsed.y+'B'}}},scales:{x:{grid:{color:'#E2E7F0'},ticks:{font:{size:12,weight:600},color:'#41506B'}},y:{grid:{color:'#E2E7F0'},ticks:{callback:v=>'$'+v+'B',color:'#7A88A6'},beginAtZero:false,min:40,max:120}}}});})();
+  (()=>{const c=document.getElementById('chartDonut');if(!c)return;new Chart(c,{type:'doughnut',data:{labels:['대형','중형','소형'],datasets:[{data:[64,24,12],backgroundColor:['#0094B3','#3D5CD6','#D81E74'],borderColor:'#FFFFFF',borderWidth:3,borderRadius:6,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#16203A',titleColor:'#fff',bodyColor:'#C3CCE6',borderColor:'#E2E7F0',borderWidth:1,padding:10,callbacks:{label:c=>' '+c.parsed+'%'}}}}});})();
+  (()=>{const c=document.getElementById('chartBar');if(!c)return;new Chart(c,{type:'bar',data:{labels:['오프라인 단독','온라인 단독','하이브리드'],datasets:[{label:'등록 전환 지수',data:[100,120,165],backgroundColor:['#0094B3','#3D5CD6','#D81E74'],borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#16203A',titleColor:'#fff',bodyColor:'#C3CCE6',borderColor:'#E2E7F0',borderWidth:1,padding:10,callbacks:{label:c=>' 지수 '+c.parsed.y}}},scales:{x:{grid:{display:false},ticks:{font:{size:12,weight:700},color:'#41506B'}},y:{grid:{color:'#E2E7F0'},ticks:{color:'#7A88A6'},min:0,max:200}}}});})();
+  (()=>{const c=document.getElementById('chartStacked');if(!c)return;new Chart(c,{type:'bar',data:{labels:['오프라인','온라인','하이브리드'],datasets:[{label:'매우 그렇다',data:[28,35,52],backgroundColor:'#0094B3',stack:'a'},{label:'그렇다',data:[22,27,30],backgroundColor:'#3D5CD6',stack:'a'},{label:'보통',data:[30,24,14],backgroundColor:'#C8922F',stack:'a'},{label:'아니다',data:[20,14,4],backgroundColor:'#E2E7F0',stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:6,boxWidth:10}},tooltip:{backgroundColor:'#16203A',titleColor:'#fff',bodyColor:'#C3CCE6',borderColor:'#E2E7F0',borderWidth:1,padding:8}},scales:{x:{grid:{display:false},ticks:{font:{size:11,weight:600},color:'#41506B'},stacked:true},y:{grid:{color:'#E2E7F0'},ticks:{color:'#7A88A6',callback:v=>v+'%'},stacked:true,max:100}}}});})();
+}
+show(0);
+</script>
+<script>
+/* 전체화면 (F키 / ⛶ 버튼) — org-slide deck */
+(function(){var nav=document.querySelector('.deck-nav');if(!nav)return;
+ var b=document.createElement('button');b.id='fs';b.setAttribute('aria-label','전체화면');b.title='전체화면 (F)';b.textContent='⛶';nav.appendChild(b);
+ function tg(){var d=document,el=d.documentElement;
+  if(!d.fullscreenElement&&!d.webkitFullscreenElement){(el.requestFullscreen||el.webkitRequestFullscreen).call(el);}
+  else{(d.exitFullscreen||d.webkitExitFullscreen).call(d);}}
+ b.onclick=tg;
+ addEventListener('keydown',function(e){if(e.key==='f'||e.key==='F'){e.preventDefault();tg();}});
+ var rs=function(){setTimeout(function(){dispatchEvent(new Event('resize'));},60);};
+ document.addEventListener('fullscreenchange',rs);document.addEventListener('webkitfullscreenchange',rs);
+})();
+</script>
+</body>
+</html>
