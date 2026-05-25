@@ -3,13 +3,16 @@
 > **[AI싱크클럽 스킬] https://litt.ly/aisyncclub**
 
 발표용 **슬라이드(HTML)** 를 만들어 주는 Claude Code / Claude 스킬입니다.
-**스타일 기반 2개 템플릿**을 제공하며, 특정 기관명에 종속되지 않습니다(실제 명칭은 입력받아 채움).
+**스타일 기반 5개 템플릿**을 제공하며, 특정 기관명에 종속되지 않습니다(실제 명칭은 입력받아 채움).
 **완전 자립형**이라 이 폴더만 복사하면 어디서든 작동합니다.
 
-| 템플릿 | 스타일 | 톤 |
+| 템플릿 | 스타일 | 톤 / 용도 |
 |---|---|---|
-| **① institutional** | 기관 신뢰형 (Institutional) | 인스티튜셔널 블루 `#003764` + 레드 액센트(절제), 라이트·플랫·신뢰형 |
-| **② event** | 프리미엄 이벤트형 (Premium Event) | 시안 `#00C2D1` + 마젠타 `#E5267E` + 골드 `#E8B864`, **그라데이션 미사용 솔리드**. 라이트(기본)/다크 |
+| **① institutional** | 기관 신뢰형 | 블루 `#003764` + 레드 액센트(절제), 라이트·플랫. 공공·기관 |
+| **② event** | 프리미엄 이벤트형 | 시안 `#00C2D1` + 마젠타 + 골드(그라데이션 미사용). 라이트(기본)/다크. 이벤트·컨퍼런스 |
+| **③ editorial** | 에디토리얼 빅타입 | 아이보리 + 잉크 `#161616` + 버밀리언 `#E63946`, 큰 세리프. 비전·강연 |
+| **④ soft-minimal** | 웜 미니멀 | 샌드 + 세이지 `#6B8F71` + 테라코타, 둥근 카드. 교육·워크숍·사내 |
+| **⑤ consulting** | 컨설팅 데이터형 | 차콜 `#1F2933` + 앰버 `#E0A100`, 표·차트 고밀도. 전략·IR·리포트 |
 
 ## ✨ 특징
 
@@ -40,7 +43,7 @@ Claude에게 이렇게 말하면 스킬이 트리거됩니다:
 
 1. **발표자료 확인** — 자료(문서/파일) 또는 주제를 받습니다.
 2. **구성안 미리보기** — 슬라이드별 제목·간략 내용·시각요소를 표로 먼저 보여주고 확인받습니다.
-3. **템플릿 선택** — ① 기관 신뢰형 / ② 이벤트형 라이트(기본) / ③ 이벤트형 다크 중 선택.
+3. **템플릿 선택** — ① 기관 신뢰형 / ② 이벤트형 라이트(기본) / ③ 이벤트형 다크 / ④ 에디토리얼 / ⑤ 웜 미니멀 / ⑥ 컨설팅 중 선택.
 4. **제작** — 선택한 템플릿으로 단일 HTML 슬라이드를 생성합니다.
 
 ## 🖼 샘플
@@ -52,6 +55,9 @@ Claude에게 이렇게 말하면 스킬이 트리거됩니다:
 | `templates/institutional-sample.html` | 기관 신뢰형 8p |
 | `templates/event-light-sample.html` | 이벤트형 라이트 8p |
 | `templates/event-dark-sample.html` | 이벤트형 다크 8p |
+| `templates/editorial-sample.html` | 에디토리얼 빅타입 8p |
+| `templates/soft-minimal-sample.html` | 웜 미니멀 8p |
+| `templates/consulting-sample.html` | 컨설팅 데이터형 8p |
 | `templates/base.html` | 의존성 없는 베이스 골조(뷰어+전체화면) |
 
 ## 📁 구성
@@ -61,19 +67,26 @@ org-slide/
 ├── SKILL.md            # 트리거 · 워크플로우 · 템플릿 선택
 ├── design-system.md    # 공통 디자인 토큰 · 컴포넌트 · 차트/인포 · 뷰어 규격
 ├── presets/
-│   ├── institutional.md  # 기관 신뢰형 토큰
-│   └── event.md          # 이벤트형(솔리드, 다크/라이트) 토큰
+│   ├── institutional.md  # 기관 신뢰형
+│   ├── event.md          # 이벤트형(솔리드, 다크/라이트)
+│   ├── editorial.md      # 에디토리얼 빅타입
+│   ├── soft-minimal.md   # 웜 미니멀
+│   └── consulting.md     # 컨설팅 데이터형
 └── templates/
     ├── base.html
     ├── institutional-sample.html
     ├── event-light-sample.html
-    └── event-dark-sample.html
+    ├── event-dark-sample.html
+    ├── editorial-sample.html
+    ├── soft-minimal-sample.html
+    └── consulting-sample.html
 ```
 
 ## 🎨 컬러 근거 (범용)
 
 - **institutional**: 공공기관 통합 CI/정부상징 계열의 딥블루·레드 체계를 일반화한 **기관 신뢰형** 팔레트. (특정 기관 비귀속)
 - **event**: 컨벤션·이벤트 업계 일반 레퍼런스를 종합한 **프리미엄 이벤트형** 솔리드 팔레트(시안/마젠타/골드).
+- **editorial · soft-minimal · consulting**: 2026 발표 디자인 트렌드(빅타입 에디토리얼 / 웜 미니멀리즘 / 엔터프라이즈 클래리티)를 반영한 범용 스타일.
 
 ---
 

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>[조직명] · STRATEGY</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#FFF;--sf:#F4F5F7;--sf2:#E9ECF0;--ink:#1F2933;--is:#3E4C59;--id:#7B8794;
+  --br:#1F2933;--b2:#4A6B8A;--ac:#E0A100;--rl:#D7DCE2;--hl:rgba(224,161,0,.18);
+  --f:"Pretendard Variable",Pretendard,"Noto Sans KR",sans-serif;--mo:"JetBrains Mono",monospace}
+*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%}
+body{background:#0B0E14;font-family:var(--f);color:var(--ink);word-break:keep-all;overflow:hidden}
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.deck{position:relative;width:1280px;height:720px;transform-origin:center}
+.slide{position:absolute;inset:0;background:var(--bg);overflow:hidden;opacity:0;visibility:hidden;
+  transition:opacity .4s;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.slide.active{opacity:1;visibility:visible}
+.body{position:absolute;inset:0;padding:56px 76px 48px;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.hd{position:absolute;top:0;left:0;right:0;height:44px;background:var(--br);display:flex;
+  justify-content:space-between;align-items:center;padding:0 76px;z-index:4}
+.hd span{font-size:11px;font-weight:600;letter-spacing:.12em;color:rgba(255,255,255,.7);text-transform:uppercase}
+.hd .ac{color:var(--ac)}
+.ft{position:absolute;bottom:0;left:0;right:0;height:36px;border-top:1px solid var(--rl);
+  display:flex;justify-content:space-between;align-items:center;padding:0 76px;z-index:4}
+.ft span{font-size:11px;color:var(--id);font-family:var(--mo);letter-spacing:.04em}
+.cap{position:fixed;top:14px;left:18px;z-index:60;color:rgba(255,255,255,.4);font-size:11px;letter-spacing:.05em}
+.deck-nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;
+  z-index:60;background:rgba(18,22,32,.76);backdrop-filter:blur(10px);padding:7px 12px;border-radius:40px}
+.deck-nav button{width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;font-size:18px;
+  background:rgba(255,255,255,.12);color:#fff;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.deck-nav button:hover{background:rgba(255,255,255,.26)}
+.deck-nav .ind{color:#fff;font-family:var(--mo);font-size:13px;min-width:56px;text-align:center}
+/* 타이포 */
+.ey{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ac)}
+.sh{font-size:24px;font-weight:900;color:var(--ink);line-height:1.15}
+.ss{font-size:13px;color:var(--is);margin-top:3px}
+.tn{font-variant-numeric:tabular-nums}
+/* KPI 그리드 */
+.kgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.kpi{background:var(--sf);border:1px solid var(--rl);border-radius:6px;padding:14px 16px;position:relative;overflow:hidden}
+.kpi.a{border-left:3px solid var(--ac)}
+.kv{font-size:28px;font-weight:900;color:var(--ink);line-height:1;font-family:var(--mo)}
+.kv .u{font-size:14px;font-weight:600;color:var(--is)}
+.kl{font-size:11px;font-weight:600;color:var(--id);margin-top:4px}
+.kd{font-size:11px;font-weight:700;color:#22863a;margin-top:4px}
+.kb{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--rl)}
+.kf{position:absolute;bottom:0;left:0;height:3px;background:var(--ac);border-radius:2px}
+/* 통계 행 */
+.srow{display:flex;border:1px solid var(--rl);border-radius:6px;background:var(--sf)}
+.si{flex:1;padding:12px 16px;border-right:1px solid var(--rl);display:flex;flex-direction:column;gap:3px}
+.si:last-child{border-right:none}
+.si.a .sn{color:var(--ac)}
+.sn{font-size:24px;font-weight:900;color:var(--ink);font-family:var(--mo)}
+.sn .u{font-size:13px;font-weight:600;color:var(--is)}
+.sl{font-size:11px;font-weight:600;color:var(--id)}
+.snt{font-size:10px;color:var(--id)}
+/* 비교 표 */
+.ct{width:100%;border-collapse:collapse;font-size:13px}
+.ct th{background:var(--br);color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;padding:7px 10px;text-align:left}
+.ct td{padding:7px 10px;border-bottom:1px solid var(--rl);color:var(--is)}
+.ct tr:nth-child(even) td{background:var(--sf)}
+.ct .hl-row td{background:rgba(224,161,0,.10);color:var(--ink);font-weight:700}
+.badge{display:inline-block;background:var(--ac);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:5px}
+/* 3-pillar */
+.prow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pl{background:var(--sf);border:1px solid var(--rl);border-radius:8px;padding:18px 16px;position:relative}
+.pl.a{border-top:3px solid var(--ac)}
+.pn{font-size:32px;font-weight:900;color:var(--rl);position:absolute;top:10px;right:14px;font-family:var(--mo);line-height:1}
+.pt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:6px}
+.pb{font-size:12px;color:var(--is);line-height:1.6}
+/* 타임라인 */
+.tlrow{display:flex;border:1px solid var(--rl);border-radius:8px;overflow:hidden}
+.tlq{flex:1;border-right:1px solid var(--rl)}
+.tlq:last-child{border-right:none}
+.tlqh{background:var(--br);color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;text-align:center;padding:6px 4px}
+.tlqh.a{background:var(--ac);color:var(--ink)}
+.tli{padding:10px;display:flex;flex-direction:column;gap:8px}
+.tli-item{display:flex;gap:7px;align-items:flex-start}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--id);flex-shrink:0;margin-top:4px}
+.dot.a{background:var(--ac)}.dot.b{background:var(--b2)}
+.tlt{font-size:11px;color:var(--is);line-height:1.45}
+.tlt strong{color:var(--ink);font-weight:700;display:block;font-size:11px}
+/* 차트 컨테이너 */
+.cw{width:100%;position:relative}
+.cw.h220{height:220px}.cw.h200{height:200px}.cw.h240{height:240px}
+/* 2단 */
+.tc{display:grid;gap:24px;align-items:start}
+.tc2{grid-template-columns:1fr 1fr}
+.tc62{grid-template-columns:3fr 2fr}
+/* So What */
+.sw{font-size:11px;color:var(--id);margin-top:5px;font-style:italic}
+/* 세그먼트 바 */
+.sb-item{display:flex;flex-direction:column;gap:4px}
+.sb-top{display:flex;justify-content:space-between;margin-bottom:1px}
+.sb-top span:first-child{font-size:12px;font-weight:700;color:var(--ink)}
+.sb-top span:last-child{font-size:12px;font-weight:900;font-family:var(--mo)}
+.sb-bg{height:7px;background:var(--sf2);border-radius:4px;overflow:hidden}
+.sb-fill{height:100%;border-radius:4px}
+/* 클로징 */
+.ci{display:flex;gap:10px;padding:10px 12px;background:var(--sf);border-radius:6px;border-left:3px solid var(--rl)}
+.ci.a{border-left-color:var(--ac)}
+.cin{font-size:18px;font-weight:900;color:var(--rl);font-family:var(--mo);line-height:1;flex-shrink:0}
+.cit{font-size:13px;color:var(--is);line-height:1.5}
+.cit strong{color:var(--ink);font-weight:700;display:block;font-size:13px;margin-bottom:1px}
+.ns{background:var(--sf);border:1px solid var(--rl);border-radius:8px;padding:18px 20px}
+.ns h4{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ac);margin-bottom:12px}
+.ns li{display:flex;gap:8px;margin-bottom:8px;font-size:12px;color:var(--is);line-height:1.5}
+.ns .nn{font-size:12px;font-weight:900;color:var(--ac);font-family:var(--mo);flex-shrink:0}
+/* 인포그래픽: 프로세스 플로우 */
+.flow{display:flex;align-items:center;gap:0;background:var(--sf);border:1px solid var(--rl);border-radius:6px;padding:10px 16px}
+.fl{font-size:11px;font-weight:700;color:var(--id);letter-spacing:.08em;text-transform:uppercase;margin-right:16px;flex-shrink:0}
+.fstep{flex:1;text-align:center;font-size:11px;font-weight:700;color:var(--ink);
+  padding:5px 6px;background:var(--bg);border-radius:4px;border:1px solid var(--rl)}
+.fstep.a{color:var(--ac);background:rgba(224,161,0,.08);border-color:var(--ac)}
+.farr{width:20px;text-align:center;color:var(--ac);font-size:14px;font-weight:900;flex-shrink:0}
+/* 로드맵 트랙 */
+.rtrack{height:5px;background:var(--sf2);border-radius:3px;margin:8px 0 18px;position:relative}
+.rfill{position:absolute;left:0;top:0;height:5px;background:var(--ac);border-radius:3px}
+.rmarks{display:grid;grid-template-columns:repeat(4,1fr);margin-bottom:8px}
+.rm{text-align:center;font-size:10px;font-weight:700;color:var(--id);letter-spacing:.06em}
+.rm.a{color:var(--ac)}
+/* 하이라이트 */
+.hl{color:var(--ink);font-weight:800;background:var(--hl);padding:0 3px;border-radius:2px}
+/* cover */
+.cover-meta{display:flex;gap:32px;margin-top:24px}
+.cm{display:flex;flex-direction:column;gap:2px}
+.cm .lb{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--id)}
+.cm .vl{font-size:13px;font-weight:600;color:var(--is)}
+.cdiv{width:48px;height:3px;background:var(--ac);border-radius:2px;margin:20px 0 0}
+.deco{position:absolute;right:76px;top:50%;transform:translateY(-50%);
+  display:grid;grid-template-columns:repeat(8,1fr);gap:7px;width:230px;height:230px;opacity:.05}
+.dd{background:var(--ink);border-radius:50%}
+</style>
+</head>
+<body>
+<span class="cap">org-slide · consulting — 샘플 8p</span>
+<div class="stage"><div class="deck" id="deck">
+
+<!-- ── 01 표지 ── -->
+<section class="slide active">
+  <div class="hd"><span class="ac">[조직명]</span><span>STRATEGY</span></div>
+  <div class="body" style="padding-top:70px;justify-content:flex-start">
+    <div class="deco" id="deco-dots"></div>
+    <div data-anim style="font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ac)">
+      [조직명] · [부서]</div>
+    <div data-anim style="font-size:44px;font-weight:900;line-height:1.1;margin-top:10px;color:var(--ink)">[조직명]<br>2026 사업 전략 리뷰</div>
+    <div data-anim style="font-size:15px;color:var(--is);margin-top:6px">Annual Strategy Review — 예시 데이터 기반</div>
+    <div class="cdiv" data-anim></div>
+    <div class="cover-meta" data-anim>
+      <div class="cm"><span class="lb">보고 기간</span><span class="vl">2026.01 – 2026.12</span></div>
+      <div class="cm"><span class="lb">작성 부서</span><span class="vl">[부서]</span></div>
+      <div class="cm"><span class="lb">보고 일자</span><span class="vl">2026. 00. 00.</span></div>
+      <div class="cm"><span class="lb">버전</span><span class="vl">v1.0 (초안)</span></div>
+    </div>
+  </div>
+  <div class="ft"><span>[조직명] · 2026 사업 전략 리뷰</span><span>01 / 08</span></div>
+</section>
+
+<!-- ── 02 Executive Summary ── -->
+<section class="slide">
+  <div class="hd"><span class="ac">[조직명]</span><span>STRATEGY · 02</span></div>
+  <div class="body" style="padding-top:62px;justify-content:flex-start;gap:10px">
+    <div data-anim><div class="ey">Executive Summary</div>
+      <div class="sh">2025 핵심 성과 요약</div><div class="ss">예시 수치 — 실제 데이터로 교체 필요</div></div>
+    <!-- 인포그래픽①: Stat Row -->
+    <div class="srow" data-anim>
+      <div class="si a"><div class="sn tn">₩2,840<span class="u">억</span></div><div class="sl">연간 매출 (목표 대비 103%)</div><div class="snt">▲ 전년比 +18% (예시)</div></div>
+      <div class="si"><div class="sn tn">34.2<span class="u">%</span></div><div class="sl">영업이익률</div><div class="snt">전년 31.5% → +2.7%p</div></div>
+      <div class="si"><div class="sn tn">1,240<span class="u">개사</span></div><div class="sl">신규 고객 확보</div><div class="snt">목표 1,100개사 대비 +12.7%</div></div>
+    </div>
+    <!-- 인포그래픽②: KPI 카드 -->
+    <div class="kgrid" data-anim>
+      <div class="kpi a"><div class="kv tn">97.4<span class="u">%</span></div><div class="kl">고객 재계약률</div><div class="kd">▲ +3.2%p YoY</div><div class="kb"><div class="kf" style="width:97%"></div></div></div>
+      <div class="kpi"><div class="kv tn">4.6<span class="u">점</span></div><div class="kl">고객 만족도 (5점 만점)</div><div class="kd">▲ +0.3점</div><div class="kb"><div class="kf" style="width:92%;background:var(--b2)"></div></div></div>
+      <div class="kpi"><div class="kv tn">28<span class="u">개국</span></div><div class="kl">해외 파트너십</div><div class="kd">▲ +7개국 신규</div><div class="kb"><div class="kf" style="width:70%;background:var(--b2)"></div></div></div>
+    </div>
+    <ul data-anim style="list-style:none;display:flex;flex-direction:column;gap:6px">
+      <li style="font-size:13px;color:var(--is);padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--ac);font-weight:700">—</span><strong style="color:var(--ink)">매출 목표 초과 달성:</strong> 연간 매출 ₩2,840억, 목표(₩2,760억) 대비 103% 달성</li>
+      <li style="font-size:13px;color:var(--is);padding-left:16px;position:relative"><span style="position:absolute;left:0;color:var(--ac);font-weight:700">—</span><strong style="color:var(--ink)">2026 핵심 과제:</strong> <span class="hl">시장 점유율 확대</span> + 신사업 3개 부문 본격 가동</li>
+    </ul>
+  </div>
+  <div class="ft"><span>[조직명] · 2026 사업 전략 리뷰</span><span>02 / 08</span></div>
+</section>
+
+<!-- ── 03 시장 분석 (Chart: Line + 세그먼트 바 small-multiples) ── -->
+<section class="slide">
+  <div class="hd"><span class="ac">[조직명]</span><span>STRATEGY · 03</span></div>
+  <div class="body" style="padding-top:62px;justify-content:flex-start;gap:12px">
+    <div data-anim><div class="ey">Market Analysis</div><div class="sh">시장 성장 추세 분석</div><div class="ss">국내 주요 시장 규모 추이 — 예시 데이터 (단위: 조 원)</div></div>
+    <div class="tc tc62" data-anim>
+      <div><div style="font-size:11px;font-weight:700;color:var(--id);margin-bottom:5px">시장 규모 추이 2020–2026E</div>
+        <div class="cw h240"><canvas id="cLine"></canvas></div>
+        <p class="sw">시장 연평균 성장률 8.4% — 2026년 예상 ₩42.3조 (예시)</p></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--id);margin-bottom:2px">세그먼트별 성장률</div>
+        <!-- 인포그래픽③: 세그먼트 small-multiples -->
+        <div class="sb-item"><div class="sb-top"><span>세그먼트 A</span><span style="color:var(--ac)">+14.2%</span></div><div class="sb-bg"><div class="sb-fill" style="width:78%;background:var(--ac)"></div></div></div>
+        <div class="sb-item"><div class="sb-top"><span>세그먼트 B</span><span style="color:var(--b2)">+9.7%</span></div><div class="sb-bg"><div class="sb-fill" style="width:56%;background:var(--b2)"></div></div></div>
+        <div class="sb-item"><div class="sb-top"><span>세그먼트 C</span><span style="color:var(--id)">+5.1%</span></div><div class="sb-bg"><div class="sb-fill" style="width:34%;background:#9AA5B1"></div></div></div>
+        <div class="sb-item"><div class="sb-top"><span>세그먼트 D</span><span style="color:var(--id)">+2.8%</span></div><div class="sb-bg"><div class="sb-fill" style="width:20%;background:#9AA5B1"></div></div></div>
+        <div style="margin-top:8px;padding:9px 12px;background:rgba(224,161,0,.10);border-radius:5px;border-left:3px solid var(--ac)">
+          <div style="font-size:10px;font-weight:700;color:var(--ac);margin-bottom:2px">So What</div>
+          <div style="font-size:11px;color:var(--is);line-height:1.5">세그먼트 A 고성장 → 집중 투자 우선순위 재편 필요 (예시)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><span>[조직명] · 2026 사업 전략 리뷰</span><span>03 / 08</span></div>
+</section>
+
+<!-- ── 04 경쟁/포지션 (비교 표 + 가로 막대) ── -->
+<section class="slide">
+  <div class="hd"><span class="ac">[조직명]</span><span>STRATEGY · 04</span></div>
+  <div class="body" style="padding-top:62px;justify-content:flex-start;gap:12px">
+    <div data-anim><div class="ey">Competitive Landscape</div><div class="sh">경쟁 포지션 분석</div><div class="ss">주요 5개사 비교 — 예시 데이터 (2025년 기준)</div></div>
+    <div class="tc tc2" data-anim style="gap:28px">
+      <!-- 인포그래픽④: 비교 표 -->
+      <div>
+        <table class="ct">
+          <thead><tr><th>구분</th><th>점유율</th><th>이익률</th><th>고객수</th></tr></thead>
+          <tbody>
+            <tr class="hl-row"><td>[조직명]<span class="badge">당사</span></td><td class="tn">23.4%</td><td class="tn">34.2%</td><td class="tn">4,820</td></tr>
+            <tr><td>경쟁사 A</td><td class="tn">19.1%</td><td class="tn">28.7%</td><td class="tn">3,910</td></tr>
+            <tr><td>경쟁사 B</td><td class="tn">15.6%</td><td class="tn">31.0%</td><td class="tn">3,240</td></tr>
+            <tr><td>경쟁사 C</td><td class="tn">12.3%</td><td class="tn">22.5%</td><td class="tn">2,610</td></tr>
+            <tr><td>경쟁사 D</td><td class="tn">8.8%</td><td class="tn">19.2%</td><td class="tn">1,870</td></tr>
+          </tbody>
+        </table>
+        <p class="sw" style="margin-top:6px">당사 1위(23.4%) — 2위와 4.3%p 격차 유지 (예시)</p>
+      </div>
+      <div><div style="font-size:11px;font-weight:700;color:var(--id);margin-bottom:5px">시장점유율 비교 (%)</div>
+        <div class="cw h220"><canvas id="cBar"></canvas></div>
+        <p class="sw">세그먼트 A 집중 공략 시 +3~5%p 확대 가능 (예시)</p></div>
+    </div>
+  </div>
+  <div class="ft"><span>[조직명] · 2026 사업 전략 리뷰</span><span>04 / 08</span></div>
+</section>
+
+<!-- ── 05 전략 방향 (3-Pillar + 프로세스 플로우) ── -->
+<section class="slide">
+  <div class="hd"><span class="ac">[조직명]</span><span>STRATEGY · 05</span></div>
+  <div class="body" style="padding-top:62px;justify-content:flex-start;gap:14px">
+    <div data-anim><div class="ey">Strategic Direction 2026</div><div class="sh">3대 전략 방향</div><div class="ss">2026년 사업 전략 핵심 축 — 예시 프레임워크</div></div>
+    <!-- 인포그래픽⑤: 3-Pillar 카드 -->
+    <div class="prow" data-anim>
+      <div class="pl a"><div class="pn">01</div><div class="pt">핵심 시장 점유율 확대</div><div class="pb">세그먼트 A·B 집중 공략. 목표 점유율 <strong>28%</strong>(+4.6%p). 영업력 강화 + 파트너 생태계 확장.</div></div>
+      <div class="pl"><div class="pn">02</div><div class="pt">신사업 포트폴리오 구축</div><div class="pb">3개 신사업 부문 본격 가동. 2026H2 누적 매출 <strong>₩320억</strong>. R&amp;D 투자 + 전략적 M&amp;A 검토.</div></div>
+      <div class="pl"><div class="pn">03</div><div class="pt">운영 효율·디지털 전환</div><div class="pb">프로세스 자동화로 비용 최적화. IT 인프라 고도화. 목표 운영비용률 <strong>-2.5%p</strong> 절감.</div></div>
+    </div>
+    <!-- 인포그래픽⑥: 프로세스 플로우 -->
+    <div class="flow" data-anim>
+      <span class="fl">실행 흐름</span>
+      <div class="fstep">현황 진단</div><div class="farr">›</div>
+      <div class="fstep a">전략 수립</div><div class="farr">›</div>
+      <div class="fstep">실행 계획</div><div class="farr">›</div>
+      <div class="fstep">모니터링</div><div class="farr">›</div>
+      <div class="fstep">성과 검토</div>
+    </div>
+  </div>
+  <div class="ft"><span>[조직명] · 2026 사업 전략 리뷰</span><span>05 / 08</span></div>
+</section>
+
+<!-- ── 06 재무/지표 (그룹 막대 + 표) ── -->
+<section class="slide">
+  <div class="hd"><span class="ac">[조직명]</span><span>STRATEGY · 06</span></div>
+  <div class="body" style="padding-top:62px;justify-content:flex-start;gap:12px">
+    <div data-anim><div class="ey">Financial Performance</div><div class="sh">분기별 재무 지표</div><div class="ss">2025년 실적 + 2026년 목표 — 예시 (단위: 억 원)</div></div>
+    <div class="tc tc2" data-anim style="gap:28px">
+      <div><div style="font-size:11px;font-weight:700;color:var(--id);margin-bottom:5px">분기별 매출 · 영업이익 · 2026 목표 (억 원)</div>
+        <div class="cw h240"><canvas id="cGroup"></canvas></div>
+        <p class="sw">Q4 최대 매출 달성 — Q3부터 영업이익률 목표 초과 (예시)</p></div>
+      <!-- 인포그래픽⑦: KPI 비교 표 -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--id);margin-bottom:5px">분기별 핵심 KPI</div>
+        <table class="ct">
+          <thead><tr><th>지표</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th></tr></thead>
+          <tbody>
+            <tr><td>매출(억)</td><td class="tn">610</td><td class="tn">680</td><td class="tn">720</td><td class="tn"><strong>830</strong></td></tr>
+            <tr><td>이익률(%)</td><td class="tn">30.1</td><td class="tn">33.4</td><td class="tn">35.6</td><td class="tn"><strong style="color:var(--ac)">37.3</strong></td></tr>
+            <tr class="hl-row"><td>신규 고객</td><td class="tn">248</td><td class="tn">302</td><td class="tn">340</td><td class="tn">350</td></tr>
+            <tr><td>2026 목표</td><td class="tn">680</td><td class="tn">760</td><td class="tn">820</td><td class="tn"><strong>940</strong></td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:8px;padding:9px 12px;background:rgba(224,161,0,.10);border-radius:5px;border-left:3px solid var(--ac)">
+          <div style="font-size:10px;font-weight:700;color:var(--ac);margin-bottom:2px">핵심 인사이트</div>
+          <div style="font-size:11px;color:var(--is);line-height:1.5">Q4 집중 현상 완화 — Q1·Q2 성장 견인이 2026 최우선 과제 (예시)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><span>[조직명] · 2026 사업 전략 리뷰</span><span>06 / 08</span></div>
+</section>
+
+<!-- ── 07 실행 로드맵 (타임라인 인포그래픽) ── -->
+<section class="slide">
+  <div class="hd"><span class="ac">[조직명]</span><span>STRATEGY · 07</span></div>
+  <div class="body" style="padding-top:62px;justify-content:flex-start;gap:12px">
+    <div data-anim><div class="ey">2026 Execution Roadmap</div><div class="sh">분기별 실행 로드맵</div><div class="ss">2026년 Q1–Q4 주요 마일스톤 — 예시</div></div>
+    <!-- 인포그래픽⑧: 진행 트랙 바 -->
+    <div data-anim>
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:10px;font-weight:700;color:var(--ac);letter-spacing:.06em">← 진행 현황 (예시: Q1 완료)</span>
+        <span style="font-size:10px;color:var(--id)">2026.01 — 2026.12</span>
+      </div>
+      <div class="rtrack"><div class="rfill" style="width:25%"></div></div>
+      <div class="rmarks">
+        <div class="rm a">Q1 완료</div><div class="rm">Q2 진행</div><div class="rm">Q3 예정</div><div class="rm">Q4 예정</div>
+      </div>
+    </div>
+    <!-- 인포그래픽⑨: 분기별 마일스톤 카드 -->
+    <div class="tlrow" data-anim>
+      <div class="tlq">
+        <div class="tlqh a">Q1 · 1–3월</div>
+        <div class="tli">
+          <div class="tli-item"><div class="dot a"></div><div class="tlt"><strong>전략 수립 확정</strong>사업부별 KPI 확정 및 배포</div></div>
+          <div class="tli-item"><div class="dot a"></div><div class="tlt"><strong>영업팀 재편</strong>세그먼트 A 전담팀 구성</div></div>
+          <div class="tli-item"><div class="dot a"></div><div class="tlt"><strong>신사업 TF 발족</strong>3개 부문 태스크포스 출범</div></div>
+        </div>
+      </div>
+      <div class="tlq">
+        <div class="tlqh">Q2 · 4–6월</div>
+        <div class="tli">
+          <div class="tli-item"><div class="dot b"></div><div class="tlt"><strong>파트너 생태계 확장</strong>해외 5개국 신규 계약</div></div>
+          <div class="tli-item"><div class="dot b"></div><div class="tlt"><strong>플랫폼 v2 출시</strong>디지털 전환 2단계</div></div>
+          <div class="tli-item"><div class="dot"></div><div class="tlt"><strong>H1 성과 검토</strong>목표 대비 실적 리뷰</div></div>
+        </div>
+      </div>
+      <div class="tlq">
+        <div class="tlqh">Q3 · 7–9월</div>
+        <div class="tli">
+          <div class="tli-item"><div class="dot b"></div><div class="tlt"><strong>신사업 1호 매출</strong>목표 ₩80억 돌파</div></div>
+          <div class="tli-item"><div class="dot"></div><div class="tlt"><strong>M&amp;A 검토 완료</strong>인수 후보 2개사 확정</div></div>
+          <div class="tli-item"><div class="dot"></div><div class="tlt"><strong>운영 자동화 1차</strong>비용 구조 최적화</div></div>
+        </div>
+      </div>
+      <div class="tlq">
+        <div class="tlqh">Q4 · 10–12월</div>
+        <div class="tli">
+          <div class="tli-item"><div class="dot a"></div><div class="tlt"><strong>연간 목표 달성</strong>매출 ₩3,200억 / 점유율 28%</div></div>
+          <div class="tli-item"><div class="dot"></div><div class="tlt"><strong>2027 전략 착수</strong>차기 3개년 계획 수립</div></div>
+          <div class="tli-item"><div class="dot"></div><div class="tlt"><strong>연간 성과 리뷰</strong>전사 KPI 결산 보고</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><span>[조직명] · 2026 사업 전략 리뷰</span><span>07 / 08</span></div>
+</section>
+
+<!-- ── 08 마무리 ── -->
+<section class="slide">
+  <div class="hd"><span class="ac">[조직명]</span><span>STRATEGY · 08</span></div>
+  <div class="body" style="padding-top:62px;justify-content:flex-start;gap:14px">
+    <div data-anim><div class="ey">Closing</div><div class="sh">요약 및 다음 단계</div></div>
+    <div class="tc tc2" data-anim style="gap:28px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:10px;font-weight:700;color:var(--id);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">핵심 요약</div>
+        <div class="ci a"><div class="cin">01</div><div class="cit"><strong>시장 1위 포지션 공고화</strong>세그먼트 A 집중 투자로 2026년 점유율 <span class="hl">28%</span> 목표 (예시)</div></div>
+        <div class="ci"><div class="cin">02</div><div class="cit"><strong>신사업 3개 부문 가동</strong>H2 누적 매출 ₩320억 — 차세대 성장 동력 확보</div></div>
+        <div class="ci"><div class="cin">03</div><div class="cit"><strong>운영 효율화로 수익성 제고</strong>비용 최적화 -2.5%p → 영업이익률 36% 이상 유지</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="ns">
+          <h4>Next Steps</h4>
+          <ol style="list-style:none">
+            <li class="ns" style="background:none;border:none;padding:0"><div style="display:flex;gap:8px;margin-bottom:8px"><span class="nn" style="font-size:12px;font-weight:900;color:var(--ac);font-family:var(--mo);flex-shrink:0">01</span><span style="font-size:12px;color:var(--is);line-height:1.5"><strong style="color:var(--ink)">사업부별 실행 계획 수립</strong> — 본 전략 기반 세부 계획 작성 및 배포</span></div></li>
+            <li class="ns" style="background:none;border:none;padding:0"><div style="display:flex;gap:8px;margin-bottom:8px"><span class="nn" style="font-size:12px;font-weight:900;color:var(--ac);font-family:var(--mo);flex-shrink:0">02</span><span style="font-size:12px;color:var(--is);line-height:1.5"><strong style="color:var(--ink)">Q2 파트너 협상 착수</strong> — 해외 5개국 신규 계약 협상 시작</span></div></li>
+            <li class="ns" style="background:none;border:none;padding:0"><div style="display:flex;gap:8px"><span class="nn" style="font-size:12px;font-weight:900;color:var(--ac);font-family:var(--mo);flex-shrink:0">03</span><span style="font-size:12px;color:var(--is);line-height:1.5"><strong style="color:var(--ink)">신사업 TF 킥오프</strong> — 3개 부문 전담팀 구성 및 로드맵 확정</span></div></li>
+          </ol>
+        </div>
+        <div style="font-size:12px;color:var(--id);padding:10px 14px;background:var(--sf2);border-radius:4px">
+          <strong style="color:var(--ink)">[문의]</strong>
+          <span style="margin-left:6px">[담당자명] · [이메일] · [연락처]</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><span>[조직명] · 2026 사업 전략 리뷰</span><span>08 / 08</span></div>
+</section>
+
+</div></div>
+
+<nav class="deck-nav">
+  <button id="prev">‹</button>
+  <span class="ind" id="ind">1 / 8</span>
+  <button id="next">›</button>
+  <button id="fs" title="전체화면 (F)">⛶</button>
+</nav>
+
+<script>
+/* 장식 도트 */
+const deco=document.getElementById('deco-dots');
+if(deco){deco.innerHTML=Array(64).fill('<div class="dd"></div>').join('');}
+
+/* 스케일 */
+const deck=document.getElementById('deck');
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.94;deck.style.transform=`scale(${s})`;}
+addEventListener('resize',fit);fit();
+
+/* 네비게이션 */
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+const ind=document.getElementById('ind');
+function reveal(s){
+  if(window.gsap)gsap.fromTo(s.querySelectorAll('[data-anim]'),
+    {opacity:0,y:10},{opacity:1,y:0,duration:.4,stagger:.04,ease:'power2.out'});
+  else s.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity=1;el.style.transform='none';});
+}
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  ind.textContent=`${i+1} / ${slides.length}`;reveal(slides[i]);}
+document.getElementById('next').onclick=()=>show(i+1);
+document.getElementById('prev').onclick=()=>show(i-1);
+
+/* 전체화면 */
+function toggleFS(){const d=document,el=d.documentElement;
+  if(!d.fullscreenElement&&!d.webkitFullscreenElement)(el.requestFullscreen||el.webkitRequestFullscreen).call(el);
+  else(d.exitFullscreen||d.webkitExitFullscreen).call(d);}
+document.getElementById('fs').onclick=toggleFS;
+document.addEventListener('fullscreenchange',()=>setTimeout(fit,60));
+document.addEventListener('webkitfullscreenchange',()=>setTimeout(fit,60));
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();show(i+1);}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(i-1);}
+  if(e.key==='f'||e.key==='F'){e.preventDefault();toggleFS();}});
+
+/* Chart.js — consulting 프리셋 */
+if(window.Chart){
+  Chart.defaults.font.family='"Pretendard Variable",Pretendard,"Noto Sans KR",sans-serif';
+  Chart.defaults.font.weight=500;Chart.defaults.color='#3E4C59';
+  Chart.defaults.plugins.legend.labels.usePointStyle=true;
+  Chart.defaults.plugins.legend.labels.boxWidth=8;
+  Chart.defaults.plugins.legend.labels.font={size:11};
+  const C1='#1F2933',C2='#E0A100',C3='#4A6B8A',GR='#D7DCE2';
+
+  /* 차트①: Line — 시장 규모 */
+  new Chart(document.getElementById('cLine'),{type:'line',
+    data:{labels:['2020','2021','2022','2023','2024','2025','2026E'],
+      datasets:[
+        {label:'전체 시장(조)',data:[22.1,24.8,27.4,30.2,34.6,38.7,42.3],borderColor:C1,backgroundColor:'rgba(31,41,51,.06)',borderWidth:2,pointRadius:4,fill:true,tension:.3},
+        {label:'당사 점유',data:[4.2,5.1,6.0,7.1,8.5,9.1,9.9],borderColor:C2,backgroundColor:'rgba(224,161,0,.08)',borderWidth:2.5,pointRadius:4,fill:true,tension:.3}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',align:'end'},tooltip:{mode:'index',intersect:false}},
+      scales:{x:{grid:{color:GR},ticks:{font:{size:11}}},
+        y:{grid:{color:GR},ticks:{font:{size:11},callback:v=>v+'조'},beginAtZero:false}}}});
+
+  /* 차트②: 가로 막대 — 점유율 */
+  new Chart(document.getElementById('cBar'),{type:'bar',
+    data:{labels:['[조직명]','경쟁사 A','경쟁사 B','경쟁사 C','경쟁사 D'],
+      datasets:[{label:'점유율(%)',data:[23.4,19.1,15.6,12.3,8.8],
+        backgroundColor:[C2,C3,'#9AA5B1','#9AA5B1','#9AA5B1'],borderRadius:4,borderSkipped:false}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.raw}%`}}},
+      scales:{x:{grid:{color:GR},ticks:{font:{size:11},callback:v=>v+'%'},max:30},
+        y:{grid:{display:false},ticks:{font:{size:11,weight:'600'}}}}}});
+
+  /* 차트③: 그룹 막대 — 분기 재무 */
+  new Chart(document.getElementById('cGroup'),{type:'bar',
+    data:{labels:['Q1','Q2','Q3','Q4'],
+      datasets:[
+        {label:'2025 매출',data:[610,680,720,830],backgroundColor:C1,borderRadius:3,borderSkipped:false},
+        {label:'영업이익',data:[184,227,256,310],backgroundColor:C2,borderRadius:3,borderSkipped:false},
+        {label:'2026 목표',data:[680,760,820,940],backgroundColor:C3,borderRadius:3,borderSkipped:false}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',align:'end'},tooltip:{mode:'index',intersect:false}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:11}}},
+        y:{grid:{color:GR},ticks:{font:{size:11},callback:v=>v+'억'},beginAtZero:true}}}});
+}
+
+show(0);
+</script>
+</body>
+</html>

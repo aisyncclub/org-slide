@@ -111,6 +111,9 @@
 |---|---|
 | institutional | 절제된 `opacity 0→1 + translateY 16px→0`, stagger 0.06s. 화려한 효과 금지. |
 | event | `scale 0.96→1 + glow(box-shadow)`, 수치 카운트업 허용. **솔리드 배경**(radial orb·그라데이션 미사용). |
+| editorial | 정적·우아. `opacity + y 12px`, 헤드라인 라인 단위 stagger. |
+| soft-minimal | 부드럽게 `opacity + y 14px + scale 0.98→1`, ease out. 급격한 효과 금지. |
+| consulting | 미니멀 `opacity + y 10px`, 빠른 stagger 0.04s. |
 
 슬라이드 전환 시 base.html의 `reveal()`로 `[data-anim]`을 1회 재생(§7 뷰어). 모션 실패해도 콘텐츠는 항상 보이게(기본 opacity 1 fallback).
 
@@ -141,6 +144,9 @@ Chart.defaults.plugins.legend.labels.boxWidth = 8;
 // institutional:  text=#3A4A60, grid=#DBE1EA
 // event:  text=#C3CCE6, grid=rgba(140,160,210,.18)
 // event-light: text=#41506B, grid=#E2E7F0
+// editorial: text=#4A4642, grid=#E3DDD0
+// soft-minimal: text=#5C554C, grid=#E5DDD0
+// consulting: text=#3E4C59, grid=#D7DCE2
 ```
 
 **프리셋별 데이터 팔레트**
@@ -150,6 +156,9 @@ Chart.defaults.plugins.legend.labels.boxWidth = 8;
 | institutional | `#003764` · `#1E5BA8` · `#4F86C6` · `#9BB8DE` (강조 1개만 `#E4032E`) |
 | event (dark) | `#00C2D1` · `#5B7BF0` · `#E5267E` · `#E8B864` |
 | event-light | `#0094B3` · `#3D5CD6` · `#D81E74` · `#C8922F` (라이트 위 대비 확보) |
+| editorial | `#161616` · `#E63946` · `#C9A227` · `#8A847A` (잉크 중심+버밀리언) |
+| soft-minimal | `#6B8F71` · `#C8755A` · `#A8B58C` · `#D9A441` (웜·소프트) |
+| consulting | `#1F2933` · `#E0A100` · `#4A6B8A` · `#9AA5B1` (차콜+앰버) |
 
 **규칙**
 - 차트 캔버스는 고정 높이 컨테이너(`<div style="height:300px">`)에 넣어 비율 깨짐 방지.

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[기관명] · WORKSHOP</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ── soft-minimal 프리셋 토큰 ── */
+:root{
+  --bg:#F6F1EA; --surface:#FFFFFF; --surface-2:#EFE8DD;
+  --ink:#2E2A25; --ink-soft:#5C554C; --ink-dim:#938B7E;
+  --brand:#6B8F71; --brand-2:#88A98D; --accent:#C8755A; --accent-2:#D9A441;
+  --rule:#E5DDD0; --hl:rgba(107,143,113,.20); --radius:18px;
+  --display:"Pretendard Variable",Pretendard,"Noto Sans KR",sans-serif;
+  --sans:"Pretendard Variable",Pretendard,"Noto Sans KR",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --pad:52px 84px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:#2A2420;font-family:var(--sans);color:var(--ink);
+  word-break:keep-all;overflow-wrap:break-word;overflow:hidden}
+
+/* 무대 */
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.deck{position:relative;width:1280px;height:720px;transform-origin:center center}
+
+/* 슬라이드 */
+.slide{position:absolute;inset:0;background:var(--bg);overflow:hidden;
+  opacity:0;visibility:hidden;transition:opacity .45s ease;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);border-radius:4px}
+.slide.active{opacity:1;visibility:visible}
+
+/* 본문 세로 중앙 정렬 */
+.body{position:absolute;inset:0;padding:var(--pad);display:flex;flex-direction:column;justify-content:center}
+.body.pt-top{justify-content:flex-start;padding-top:88px}
+
+/* 헤더·푸터 */
+.head{position:absolute;top:28px;left:84px;right:84px;display:flex;justify-content:space-between;align-items:center;z-index:4}
+.head-org{font-size:12px;font-weight:600;color:var(--ink-dim);letter-spacing:.06em;text-transform:uppercase}
+.head-chap{font-size:11px;font-weight:500;color:var(--ink-dim);letter-spacing:.08em}
+.foot{position:absolute;bottom:24px;left:84px;right:84px;display:flex;justify-content:space-between;align-items:center;z-index:4}
+.foot-topic{font-size:11px;color:var(--ink-dim);letter-spacing:.03em}
+.foot-pg{font-size:11px;font-family:var(--mono);color:var(--ink-dim);letter-spacing:.06em}
+
+/* 공통 타이포 */
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin-bottom:10px}
+.section-h{font-size:32px;font-weight:800;line-height:1.25;color:var(--ink);margin-bottom:8px}
+.section-sub{font-size:15px;font-weight:400;line-height:1.65;color:var(--ink-soft)}
+.hl{color:var(--brand);font-weight:800;background:linear-gradient(transparent 60%,var(--hl) 60%);padding:0 3px}
+.so-what{font-size:12px;font-weight:500;color:var(--ink-dim);text-align:center;margin-top:10px;letter-spacing:.02em}
+.card-sm{background:var(--surface);border-radius:14px;padding:16px 20px;box-shadow:0 2px 10px rgba(46,42,37,.06)}
+
+/* ── S1: Cover ── */
+.cover-bg{position:absolute;inset:0;background:var(--bg)}
+.cover-blob{position:absolute;width:480px;height:480px;border-radius:50%;
+  background:rgba(107,143,113,.12);top:-80px;right:-80px;pointer-events:none}
+.cover-blob2{position:absolute;width:300px;height:300px;border-radius:50%;
+  background:rgba(200,117,90,.08);bottom:-60px;left:40px;pointer-events:none}
+.cover-inner{display:flex;flex-direction:column;justify-content:center;height:100%;
+  padding:var(--pad);position:relative;z-index:2}
+.cover-tag{display:inline-flex;align-items:center;gap:8px;background:var(--surface);
+  border-radius:40px;padding:6px 16px;margin-bottom:28px;align-self:flex-start;
+  box-shadow:0 2px 10px rgba(46,42,37,.08)}
+.cover-tag-dot{width:8px;height:8px;border-radius:50%;background:var(--brand)}
+.cover-tag-txt{font-size:12px;font-weight:600;color:var(--brand);letter-spacing:.08em;text-transform:uppercase}
+.cover-title{font-size:46px;font-weight:800;line-height:1.18;color:var(--ink);margin-bottom:14px}
+.cover-sub{font-size:17px;font-weight:400;line-height:1.6;color:var(--ink-soft);margin-bottom:36px;max-width:560px}
+.cover-meta-row{display:flex;gap:28px;flex-wrap:wrap}
+.cover-meta-item{display:flex;flex-direction:column;gap:3px}
+.cover-meta-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim)}
+.cover-meta-val{font-size:14px;font-weight:600;color:var(--ink-soft)}
+.cover-deco{position:absolute;right:84px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:16px;align-items:center;z-index:2}
+.cover-deco-card{background:var(--surface);border-radius:20px;padding:20px 24px;text-align:center;
+  box-shadow:0 6px 24px rgba(46,42,37,.09);min-width:140px}
+.cover-deco-num{font-size:36px;font-weight:800;font-family:var(--mono);color:var(--brand);line-height:1}
+.cover-deco-lbl{font-size:11px;font-weight:500;color:var(--ink-dim);margin-top:4px}
+
+/* ── S2: 목표 카드 ── */
+.goal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px}
+.goal-card{background:var(--surface);border-radius:20px;padding:26px 24px;
+  box-shadow:0 4px 16px rgba(46,42,37,.07);display:flex;flex-direction:column;gap:14px}
+.goal-num{width:40px;height:40px;border-radius:50%;background:var(--brand);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;font-family:var(--mono);color:#fff;flex-shrink:0}
+.goal-num.accent{background:var(--accent)}
+.goal-num.gold{background:var(--accent-2)}
+.goal-title{font-size:17px;font-weight:700;color:var(--ink);line-height:1.3}
+.goal-desc{font-size:13px;font-weight:400;line-height:1.6;color:var(--ink-soft)}
+.goal-tag{display:inline-block;background:var(--hl);color:var(--brand);
+  border-radius:8px;padding:3px 10px;font-size:11px;font-weight:600;letter-spacing:.04em}
+.goal-tag.terracotta{background:rgba(200,117,90,.15);color:var(--accent)}
+.goal-tag.gold{background:rgba(217,164,65,.15);color:var(--accent-2)}
+
+/* ── S3: 도넛 현황 ── */
+.s3-layout{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;margin-top:20px}
+.donut-wrap{position:relative;height:240px}
+.donut-legend-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.donut-legend-item{display:flex;align-items:center;gap:10px}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-lbl{font-size:13px;color:var(--ink-soft);flex:1}
+.legend-val{font-size:13px;font-weight:700;font-family:var(--mono);color:var(--ink)}
+.s3-insight{display:flex;flex-direction:column;gap:12px}
+.insight-card{background:var(--surface);border-radius:16px;padding:18px 20px;
+  box-shadow:0 3px 12px rgba(46,42,37,.06);border-left:3px solid var(--brand)}
+.insight-card.accent{border-left-color:var(--accent)}
+.insight-card.gold{border-left-color:var(--accent-2)}
+.insight-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:5px}
+.insight-text{font-size:14px;font-weight:600;line-height:1.5;color:var(--ink)}
+
+/* ── S4: 타임라인 ── */
+.timeline-track{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:28px;position:relative}
+.timeline-track::before{content:'';position:absolute;top:32px;left:12.5%;right:12.5%;
+  height:2px;background:var(--rule);z-index:0}
+.tl-step{display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;z-index:1}
+.tl-node{width:64px;height:64px;border-radius:50%;background:var(--surface);
+  border:2px solid var(--rule);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(46,42,37,.08)}
+.tl-node.active-node{background:var(--brand);border-color:var(--brand)}
+.tl-node.accent-node{background:var(--accent);border-color:var(--accent)}
+.tl-node svg{width:26px;height:26px}
+.tl-step-label{font-size:13px;font-weight:700;color:var(--ink);text-align:center;line-height:1.35}
+.tl-step-sub{font-size:11px;font-weight:400;color:var(--ink-dim);text-align:center;line-height:1.45}
+.tl-step-time{background:var(--surface-2);border-radius:8px;padding:4px 10px;
+  font-size:11px;font-weight:600;font-family:var(--mono);color:var(--ink-soft)}
+.tl-step-time.brand{background:var(--hl);color:var(--brand)}
+.tl-step-time.accent{background:rgba(200,117,90,.15);color:var(--accent)}
+
+/* ── S5: Before/After + 막대 ── */
+.s5-layout{display:grid;grid-template-columns:1fr 1.3fr;gap:28px;align-items:stretch;margin-top:20px}
+.vs-box{display:grid;grid-template-rows:1fr 1fr;gap:14px}
+.vs-card{background:var(--surface);border-radius:18px;padding:20px 22px;box-shadow:0 3px 12px rgba(46,42,37,.06)}
+.vs-card-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.vs-pill{border-radius:8px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.04em}
+.vs-before{background:rgba(147,139,126,.15);color:var(--ink-dim)}
+.vs-after{background:rgba(107,143,113,.18);color:var(--brand)}
+.vs-items{display:flex;flex-direction:column;gap:6px}
+.vs-item{font-size:13px;font-weight:400;color:var(--ink-soft);line-height:1.5;padding-left:14px;position:relative}
+.vs-item::before{content:'·';position:absolute;left:4px;color:var(--ink-dim)}
+.vs-item.brand::before{content:'✓';color:var(--brand);font-weight:700}
+.bar-wrap{height:220px;position:relative}
+
+/* ── S6: 아이콘 그리드 ── */
+.icon-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px}
+.ic-card{background:var(--surface);border-radius:20px;padding:22px 20px;
+  box-shadow:0 4px 14px rgba(46,42,37,.07);display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.ic-chip{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ic-chip.sage{background:rgba(107,143,113,.16)}
+.ic-chip.terra{background:rgba(200,117,90,.14)}
+.ic-chip.gold{background:rgba(217,164,65,.14)}
+.ic-chip.soft{background:var(--surface-2)}
+.ic-title{font-size:15px;font-weight:700;color:var(--ink);line-height:1.3}
+.ic-desc{font-size:12px;font-weight:400;line-height:1.55;color:var(--ink-soft)}
+
+/* ── S7: 게이지 + Stat ── */
+.s7-layout{display:grid;grid-template-columns:1fr 1.6fr;gap:32px;align-items:center;margin-top:20px}
+.gauge-group{display:flex;flex-direction:column;gap:16px;align-items:center}
+.gauge-ring{position:relative;display:flex;align-items:center;justify-content:center}
+.gauge-inner{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-pct{font-size:32px;font-weight:800;font-family:var(--mono);color:var(--brand);line-height:1}
+.gauge-unit{font-size:11px;font-weight:500;color:var(--ink-dim)}
+.gauge-label{font-size:13px;font-weight:600;color:var(--ink-soft);text-align:center}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.stat-card{background:var(--surface);border-radius:16px;padding:18px 16px;text-align:center;box-shadow:0 3px 10px rgba(46,42,37,.06)}
+.stat-num{font-size:28px;font-weight:800;font-family:var(--mono);line-height:1}
+.stat-num.sage{color:var(--brand)}
+.stat-num.terra{color:var(--accent)}
+.stat-num.gold{color:var(--accent-2)}
+.stat-lbl{font-size:11px;font-weight:500;color:var(--ink-dim);margin-top:4px;line-height:1.35}
+.checklist{display:flex;flex-direction:column;gap:8px}
+.check-item{display:flex;align-items:center;gap:10px;background:var(--surface);
+  border-radius:12px;padding:10px 14px;box-shadow:0 2px 8px rgba(46,42,37,.05)}
+.check-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.check-icon.done{background:var(--hl)}
+.check-icon.todo{background:var(--surface-2)}
+.check-text{font-size:13px;font-weight:500;color:var(--ink)}
+.check-text.dim{color:var(--ink-dim)}
+
+/* ── S8: Closing ── */
+.closing-bg{position:absolute;inset:0;background:var(--bg)}
+.closing-blob{position:absolute;width:500px;height:500px;border-radius:50%;
+  background:rgba(107,143,113,.10);bottom:-120px;right:-100px;pointer-events:none}
+.closing-inner{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  height:100%;padding:var(--pad);position:relative;z-index:2;gap:24px}
+.closing-callout{background:var(--surface);border-radius:24px;padding:32px 36px;
+  box-shadow:0 8px 32px rgba(46,42,37,.09);border-left:4px solid var(--brand);max-width:640px}
+.closing-callout-quote{font-size:22px;font-weight:700;line-height:1.45;color:var(--ink);margin-bottom:12px}
+.closing-callout-sub{font-size:14px;font-weight:400;line-height:1.6;color:var(--ink-soft)}
+.closing-cta-row{display:flex;gap:14px;flex-wrap:wrap}
+.cta-btn{display:inline-flex;align-items:center;gap:8px;border-radius:40px;padding:12px 26px;
+  font-size:14px;font-weight:700;cursor:pointer;border:none;letter-spacing:.02em;transition:opacity .2s}
+.cta-btn.primary{background:var(--brand);color:#fff}
+.cta-btn.secondary{background:var(--surface);color:var(--ink-soft);border:1.5px solid var(--rule)}
+.cta-btn:hover{opacity:.84}
+.closing-note{font-size:12px;color:var(--ink-dim);line-height:1.6}
+
+/* ── 네비게이션 바 ── */
+.deck-nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;
+  z-index:60;background:rgba(42,36,32,.80);backdrop-filter:blur(10px);padding:7px 12px;border-radius:40px;
+  box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.deck-nav button{width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;font-size:18px;
+  background:rgba(246,241,234,.14);color:#F6F1EA;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.deck-nav button:hover{background:rgba(246,241,234,.28)}
+.deck-nav .ind{color:#F6F1EA;font-family:var(--mono);font-size:13px;min-width:56px;text-align:center;letter-spacing:.05em}
+.cap{position:fixed;top:14px;left:18px;z-index:60;color:rgba(246,241,234,.45);font-size:11px;letter-spacing:.04em}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<span class="cap">org-slide · soft-minimal — 샘플 8p</span>
+<div class="stage">
+  <div class="deck" id="deck">
+
+    <!-- ══ S1 표지 ══ -->
+    <section class="slide active">
+      <header class="head"><span class="head-org">[기관명]</span><span class="head-chap">WORKSHOP</span></header>
+      <div class="cover-bg"><div class="cover-blob"></div><div class="cover-blob2"></div></div>
+      <div class="cover-inner">
+        <div class="cover-tag" data-anim><span class="cover-tag-dot"></span><span class="cover-tag-txt">[팀명] AI 워크숍</span></div>
+        <h1 class="cover-title" data-anim>함께 배우는<br>실무 자동화</h1>
+        <p class="cover-sub" data-anim>일상 업무에 AI를 조용히 연결하는 방법 —<br>오늘 바로 쓸 수 있는 실습 중심 프로그램</p>
+        <div class="cover-meta-row" data-anim>
+          <div class="cover-meta-item"><span class="cover-meta-label">주관</span><span class="cover-meta-val">[팀명]</span></div>
+          <div class="cover-meta-item"><span class="cover-meta-label">일시</span><span class="cover-meta-val">2026. 00. 00</span></div>
+          <div class="cover-meta-item"><span class="cover-meta-label">진행</span><span class="cover-meta-val">[진행자]</span></div>
+        </div>
+      </div>
+      <div class="cover-deco">
+        <div class="cover-deco-card" data-anim><div class="cover-deco-num">3h</div><div class="cover-deco-lbl">총 실습 시간</div></div>
+        <div class="cover-deco-card" data-anim><div class="cover-deco-num">6</div><div class="cover-deco-lbl">핵심 도구</div></div>
+        <div class="cover-deco-card" data-anim><div class="cover-deco-num">100%</div><div class="cover-deco-lbl">실습 기반</div></div>
+      </div>
+      <footer class="foot"><span class="foot-topic">[팀명] AI 워크숍 — 함께 배우는 실무 자동화</span><span class="foot-pg">01 / 08</span></footer>
+    </section>
+
+    <!-- ══ S2 목표 ══ -->
+    <section class="slide">
+      <header class="head"><span class="head-org">[기관명]</span><span class="head-chap">WORKSHOP · 목표</span></header>
+      <div class="body">
+        <div class="eyebrow" data-anim>Today's Goals</div>
+        <h2 class="section-h" data-anim>오늘 워크숍을 마치면 <span class="hl">이 3가지</span>를 가져갑니다</h2>
+        <div class="goal-grid" data-anim>
+          <div class="goal-card">
+            <div class="goal-num">01</div>
+            <div><div class="goal-title">AI 도구 직접 체험</div><div class="goal-desc">이론이 아닌 내 업무 데이터로 직접 실습. 막막함 대신 "이거 되네" 경험을 가져갑니다.</div></div>
+            <span class="goal-tag">실습 중심</span>
+          </div>
+          <div class="goal-card">
+            <div class="goal-num accent">02</div>
+            <div><div class="goal-title">반복 업무 자동화 설계</div><div class="goal-desc">주 3시간 이상 반복되는 작업 1개를 골라 자동화 플로우를 직접 만들어봅니다.</div></div>
+            <span class="goal-tag terracotta">즉시 적용</span>
+          </div>
+          <div class="goal-card">
+            <div class="goal-num gold">03</div>
+            <div><div class="goal-title">팀 공유 템플릿 확보</div><div class="goal-desc">오늘 만든 프롬프트·플로우를 팀 전체가 쓸 수 있는 공유 자산으로 정리합니다.</div></div>
+            <span class="goal-tag gold">팀 자산화</span>
+          </div>
+        </div>
+      </div>
+      <footer class="foot"><span class="foot-topic">[팀명] AI 워크숍 — 함께 배우는 실무 자동화</span><span class="foot-pg">02 / 08</span></footer>
+    </section>
+
+    <!-- ══ S3 현황 (도넛 차트 1) ══ -->
+    <section class="slide">
+      <header class="head"><span class="head-org">[기관명]</span><span class="head-chap">WORKSHOP · 현황</span></header>
+      <div class="body">
+        <div class="eyebrow" data-anim>Current State</div>
+        <h2 class="section-h" data-anim>우리 팀의 <span class="hl">시간 분포</span>는 어디에 쏠려 있나요?</h2>
+        <div class="s3-layout" data-anim>
+          <div>
+            <div class="donut-wrap"><canvas id="donutChart"></canvas></div>
+            <div class="donut-legend-list">
+              <div class="donut-legend-item"><div class="legend-dot" style="background:#6B8F71"></div><span class="legend-lbl">전략·기획 업무</span><span class="legend-val">18%</span></div>
+              <div class="donut-legend-item"><div class="legend-dot" style="background:#C8755A"></div><span class="legend-lbl">반복·수작업</span><span class="legend-val">47%</span></div>
+              <div class="donut-legend-item"><div class="legend-dot" style="background:#A8B58C"></div><span class="legend-lbl">커뮤니케이션</span><span class="legend-val">23%</span></div>
+              <div class="donut-legend-item"><div class="legend-dot" style="background:#D9A441"></div><span class="legend-lbl">기타</span><span class="legend-val">12%</span></div>
+            </div>
+          </div>
+          <div class="s3-insight">
+            <div class="insight-card accent"><div class="insight-label">주목</div><div class="insight-text">업무 시간의 <strong>47%</strong>가 반복 수작업 — 자동화 여지가 가장 큽니다</div></div>
+            <div class="insight-card"><div class="insight-label">기회</div><div class="insight-text">반복 업무 50% 자동화 시 <strong>주당 약 9시간</strong> 확보 가능 (팀 기준)</div></div>
+            <div class="insight-card gold"><div class="insight-label">목표</div><div class="insight-text">전략·기획 비중을 <strong>18% → 35%</strong>로 — AI가 실무 시간을 재배분합니다</div></div>
+          </div>
+        </div>
+        <p class="so-what" data-anim>반복 수작업 47% = 자동화 최우선 타깃 &nbsp;→&nbsp; 오늘 워크숍에서 직접 줄여봅니다</p>
+      </div>
+      <footer class="foot"><span class="foot-topic">[팀명] AI 워크숍 — 함께 배우는 실무 자동화</span><span class="foot-pg">03 / 08</span></footer>
+    </section>
+
+    <!-- ══ S4 학습 흐름 타임라인 ══ -->
+    <section class="slide">
+      <header class="head"><span class="head-org">[기관명]</span><span class="head-chap">WORKSHOP · 흐름</span></header>
+      <div class="body">
+        <div class="eyebrow" data-anim>Workshop Flow</div>
+        <h2 class="section-h" data-anim>오늘의 <span class="hl">4단계 학습 흐름</span></h2>
+        <p class="section-sub" data-anim>도입 → 이해 → 실습 → 공유 순서로, 이론보다 직접 해보는 시간이 70%입니다</p>
+        <div class="timeline-track" data-anim>
+          <div class="tl-step">
+            <div class="tl-node active-node"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></div>
+            <div class="tl-step-label">도입</div><div class="tl-step-sub">왜 지금 AI인가<br>팀 현황 공유</div>
+            <div class="tl-step-time brand">30분</div>
+          </div>
+          <div class="tl-step">
+            <div class="tl-node"><svg viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+            <div class="tl-step-label">이해</div><div class="tl-step-sub">핵심 도구 소개<br>데모 시연</div>
+            <div class="tl-step-time">45분</div>
+          </div>
+          <div class="tl-step">
+            <div class="tl-node accent-node"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+            <div class="tl-step-label">실습</div><div class="tl-step-sub">자동화 플로우<br>직접 제작</div>
+            <div class="tl-step-time accent">90분</div>
+          </div>
+          <div class="tl-step">
+            <div class="tl-node"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-2)" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+            <div class="tl-step-label">공유</div><div class="tl-step-sub">팀 발표·피드백<br>템플릿 정리</div>
+            <div class="tl-step-time">15분</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:28px" data-anim>
+          <div class="card-sm" style="text-align:center;padding:12px 20px"><div style="font-size:11px;font-weight:600;color:var(--ink-dim);margin-bottom:4px">총 시간</div><div style="font-size:20px;font-weight:800;font-family:var(--mono);color:var(--ink)">3h</div></div>
+          <div class="card-sm" style="text-align:center;padding:12px 20px"><div style="font-size:11px;font-weight:600;color:var(--ink-dim);margin-bottom:4px">실습 비중</div><div style="font-size:20px;font-weight:800;font-family:var(--mono);color:var(--accent)">70%</div></div>
+          <div class="card-sm" style="text-align:center;padding:12px 20px"><div style="font-size:11px;font-weight:600;color:var(--ink-dim);margin-bottom:4px">팀별 산출물</div><div style="font-size:20px;font-weight:800;font-family:var(--mono);color:var(--brand)">1개+</div></div>
+        </div>
+      </div>
+      <footer class="foot"><span class="foot-topic">[팀명] AI 워크숍 — 함께 배우는 실무 자동화</span><span class="foot-pg">04 / 08</span></footer>
+    </section>
+
+    <!-- ══ S5 Before/After + 막대 차트 2 ══ -->
+    <section class="slide">
+      <header class="head"><span class="head-org">[기관명]</span><span class="head-chap">WORKSHOP · 비교</span></header>
+      <div class="body">
+        <div class="eyebrow" data-anim>Before / After</div>
+        <h2 class="section-h" data-anim>AI 도입 전후 — <span class="hl">어떻게 달라지나요?</span></h2>
+        <div class="s5-layout" data-anim>
+          <div class="vs-box">
+            <div class="vs-card">
+              <div class="vs-card-header"><span class="vs-pill vs-before">BEFORE</span></div>
+              <div class="vs-items">
+                <div class="vs-item">보고서 초안 작성 — 평균 4시간</div>
+                <div class="vs-item">회의록 정리 — 매번 30분 수작업</div>
+                <div class="vs-item">데이터 취합 — 여러 파일 직접 병합</div>
+              </div>
+            </div>
+            <div class="vs-card">
+              <div class="vs-card-header"><span class="vs-pill vs-after">AFTER</span></div>
+              <div class="vs-items">
+                <div class="vs-item brand">AI 보고서 초안 — 20분 이내</div>
+                <div class="vs-item brand">자동 회의록 → 즉시 공유 가능</div>
+                <div class="vs-item brand">데이터 자동 취합 → 클릭 1회</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="bar-wrap"><canvas id="barChart"></canvas></div>
+            <p class="so-what">반복 업무 소요 시간 평균 <strong>68% 단축</strong> — 절약 시간은 기획·검토에 재투자</p>
+          </div>
+        </div>
+      </div>
+      <footer class="foot"><span class="foot-topic">[팀명] AI 워크숍 — 함께 배우는 실무 자동화</span><span class="foot-pg">05 / 08</span></footer>
+    </section>
+
+    <!-- ══ S6 핵심 팁 아이콘 그리드 ══ -->
+    <section class="slide">
+      <header class="head"><span class="head-org">[기관명]</span><span class="head-chap">WORKSHOP · 팁</span></header>
+      <div class="body pt-top">
+        <div class="eyebrow" data-anim>Key Tips</div>
+        <h2 class="section-h" data-anim>실무 AI 활용 <span class="hl">6가지 핵심 원칙</span></h2>
+        <div class="icon-grid" data-anim>
+          <div class="ic-card"><div class="ic-chip sage"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B8F71" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 5-4 9-9 9S3 17 3 12 7 3 12 3s9 4 9 9z"/></svg></div><div class="ic-title">구체적으로 요청하기</div><div class="ic-desc">"잘 써줘"보다 "300자, 격식체, 항목 3개"처럼 조건을 명확히 전달합니다.</div></div>
+          <div class="ic-card"><div class="ic-chip terra"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8755A" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="ic-title">초안으로만 활용</div><div class="ic-desc">AI 결과물은 출발점입니다. 최종 판단과 검토는 반드시 사람이 합니다.</div></div>
+          <div class="ic-card"><div class="ic-chip gold"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><div class="ic-title">반복 작업부터 시작</div><div class="ic-desc">매주 반복되는 업무 1가지에 AI를 먼저 적용. 작은 성공이 팀 전체로 퍼집니다.</div></div>
+          <div class="ic-card"><div class="ic-chip soft"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#938B7E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><div class="ic-title">프롬프트 저장·공유</div><div class="ic-desc">잘 동작한 프롬프트는 팀 문서에 저장. 매번 다시 만들 필요가 없어집니다.</div></div>
+          <div class="ic-card"><div class="ic-chip sage"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B8F71" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="ic-title">팀 단위로 배우기</div><div class="ic-desc">혼자 익히면 개인 생산성, 팀이 같이 익히면 협업 생산성. 공유 학습이 효과 2배.</div></div>
+          <div class="ic-card"><div class="ic-chip terra"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8755A" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="ic-title">작게 측정·개선</div><div class="ic-desc">도입 전 소요 시간을 기록하고 2주 후 비교. 숫자로 보면 다음 단계가 보입니다.</div></div>
+        </div>
+      </div>
+      <footer class="foot"><span class="foot-topic">[팀명] AI 워크숍 — 함께 배우는 실무 자동화</span><span class="foot-pg">06 / 08</span></footer>
+    </section>
+
+    <!-- ══ S7 진행률 게이지 + Stat Row ══ -->
+    <section class="slide">
+      <header class="head"><span class="head-org">[기관명]</span><span class="head-chap">WORKSHOP · 진행</span></header>
+      <div class="body">
+        <div class="eyebrow" data-anim>Progress</div>
+        <h2 class="section-h" data-anim>워크숍 <span class="hl">진행 현황</span>과 오늘의 수치</h2>
+        <div class="s7-layout" data-anim>
+          <div class="gauge-group">
+            <div class="gauge-ring">
+              <svg width="160" height="160" viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r="64" fill="none" stroke="var(--rule)" stroke-width="14"/>
+                <circle cx="80" cy="80" r="64" fill="none" stroke="var(--brand)" stroke-width="14"
+                  stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="80"
+                  transform="rotate(-90 80 80)"/>
+              </svg>
+              <div class="gauge-inner"><span class="gauge-pct">80%</span><span class="gauge-unit">완료</span></div>
+            </div>
+            <div class="gauge-label">오늘 실습 목표<br>달성률</div>
+            <div style="height:110px;width:160px;margin-top:8px"><canvas id="miniDonut"></canvas></div>
+            <p class="so-what" style="font-size:11px">참여 온도 분포</p>
+          </div>
+          <div>
+            <div class="stat-row">
+              <div class="stat-card"><div class="stat-num sage">18</div><div class="stat-lbl">참석 인원 (명)</div></div>
+              <div class="stat-card"><div class="stat-num terra">4</div><div class="stat-lbl">완성된 자동화 플로우</div></div>
+              <div class="stat-card"><div class="stat-num gold">92%</div><div class="stat-lbl">만족도 (사전 설문)</div></div>
+            </div>
+            <div class="checklist">
+              <div class="check-item"><div class="check-icon done"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linecap="round"><polyline points="2 7 5.5 10.5 11 3.5"/></svg></div><span class="check-text">도입 세션 — 현황 공유 및 목표 설정 완료</span></div>
+              <div class="check-item"><div class="check-icon done"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linecap="round"><polyline points="2 7 5.5 10.5 11 3.5"/></svg></div><span class="check-text">이해 세션 — 핵심 도구 데모 시연 완료</span></div>
+              <div class="check-item"><div class="check-icon done"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linecap="round"><polyline points="2 7 5.5 10.5 11 3.5"/></svg></div><span class="check-text">실습 세션 — 자동화 플로우 팀별 제작 완료</span></div>
+              <div class="check-item"><div class="check-icon todo"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--ink-dim)" stroke-width="2" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="4"/></svg></div><span class="check-text dim">공유 세션 — 팀 발표 및 템플릿 정리 (진행 중)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="foot"><span class="foot-topic">[팀명] AI 워크숍 — 함께 배우는 실무 자동화</span><span class="foot-pg">07 / 08</span></footer>
+    </section>
+
+    <!-- ══ S8 마무리 ══ -->
+    <section class="slide">
+      <header class="head"><span class="head-org">[기관명]</span><span class="head-chap">WORKSHOP · 마무리</span></header>
+      <div class="closing-bg"><div class="closing-blob"></div></div>
+      <div class="closing-inner">
+        <div class="closing-callout" data-anim>
+          <div class="closing-callout-quote">"AI는 일을 빼앗는 게 아니라,<br>일하는 방식을 바꿉니다."</div>
+          <div class="closing-callout-sub">오늘 직접 만든 자동화 플로우가 팀의 첫 번째 AI 자산입니다.<br>작은 실험이 쌓이면 조직 전체의 변화가 됩니다.</div>
+        </div>
+        <div class="closing-cta-row" data-anim>
+          <button class="cta-btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>[자료 링크]</button>
+          <button class="cta-btn secondary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>[문의 이메일]</button>
+        </div>
+        <p class="closing-note" data-anim>본 자료는 [팀명] 내부 워크숍용 샘플입니다.<br>추가 문의 및 후속 세션 요청: [문의처] &nbsp;·&nbsp; 자료 보관 위치: [자료 링크]</p>
+      </div>
+      <footer class="foot"><span class="foot-topic">[팀명] AI 워크숍 — 함께 배우는 실무 자동화</span><span class="foot-pg">08 / 08</span></footer>
+    </section>
+
+  </div><!-- /.deck -->
+</div><!-- /.stage -->
+
+<nav class="deck-nav">
+  <button id="prev" aria-label="이전">‹</button>
+  <span class="ind" id="ind">1 / 8</span>
+  <button id="next" aria-label="다음">›</button>
+  <button id="fs" aria-label="전체화면" title="전체화면 (F)">⛶</button>
+</nav>
+
+<script>
+/* deck 스케일 */
+const deck=document.getElementById('deck');
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720)*0.94;deck.style.transform=`scale(${s})`;}
+addEventListener('resize',fit);fit();
+
+/* 네비게이션 */
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+const ind=document.getElementById('ind');
+function reveal(s){if(window.gsap)gsap.fromTo(s.querySelectorAll('[data-anim]'),
+  {opacity:0,y:14,scale:.98},{opacity:1,y:0,scale:1,duration:.55,stagger:.06,ease:'power2.out'});}
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  ind.textContent=`${i+1} / ${slides.length}`;reveal(slides[i]);}
+document.getElementById('next').onclick=()=>show(i+1);
+document.getElementById('prev').onclick=()=>show(i-1);
+
+/* 전체화면 */
+function toggleFS(){const d=document,el=d.documentElement;
+  if(!d.fullscreenElement&&!d.webkitFullscreenElement)(el.requestFullscreen||el.webkitRequestFullscreen).call(el);
+  else(d.exitFullscreen||d.webkitExitFullscreen).call(d);}
+document.getElementById('fs').onclick=toggleFS;
+document.addEventListener('fullscreenchange',()=>setTimeout(fit,60));
+document.addEventListener('webkitfullscreenchange',()=>setTimeout(fit,60));
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();show(i+1);}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(i-1);}
+  if(e.key==='f'||e.key==='F'){e.preventDefault();toggleFS();}});
+show(0);
+
+/* Chart.js — 로드 시 전부 init */
+if(window.Chart){
+  Chart.defaults.font.family='Pretendard,"Noto Sans KR",sans-serif';
+  Chart.defaults.font.weight=500;
+  Chart.defaults.color='#5C554C';
+  Chart.defaults.plugins.legend.labels.usePointStyle=true;
+  Chart.defaults.plugins.legend.labels.boxWidth=8;
+
+  /* 차트 1: S3 도넛 — 시간 분포 */
+  new Chart(document.getElementById('donutChart'),{
+    type:'doughnut',
+    data:{labels:['전략·기획','반복·수작업','커뮤니케이션','기타'],
+      datasets:[{data:[18,47,23,12],
+        backgroundColor:['#6B8F71','#C8755A','#A8B58C','#D9A441'],
+        borderColor:'#F6F1EA',borderWidth:3,borderRadius:6,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.parsed}%`}}}}
+  });
+
+  /* 차트 2: S5 둥근 막대 — Before/After */
+  new Chart(document.getElementById('barChart'),{
+    type:'bar',
+    data:{labels:['보고서 초안','회의록 정리','데이터 취합','이메일 초안'],
+      datasets:[
+        {label:'도입 전 (분)',data:[240,30,90,25],backgroundColor:'#E5DDD0',borderRadius:10,barPercentage:.42},
+        {label:'도입 후 (분)',data:[20,5,8,5],backgroundColor:'#6B8F71',borderRadius:10,barPercentage:.42}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{grid:{display:false},ticks:{color:'#938B7E',font:{size:11}}},
+              y:{grid:{color:'#E5DDD0'},ticks:{color:'#938B7E',font:{size:11}},beginAtZero:true}},
+      plugins:{legend:{position:'top',labels:{color:'#5C554C',font:{size:11}}}}}
+  });
+
+  /* 차트 3: S7 미니 도넛 — 참여 온도 */
+  new Chart(document.getElementById('miniDonut'),{
+    type:'doughnut',
+    data:{labels:['매우 적극','적극','보통'],
+      datasets:[{data:[52,33,15],
+        backgroundColor:['#6B8F71','#A8B58C','#E5DDD0'],
+        borderColor:'#F6F1EA',borderWidth:2,borderRadius:4,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{position:'right',labels:{color:'#5C554C',font:{size:10},boxWidth:7,padding:6}}}}
+  });
+}
+</script>
+</body>
+</html>

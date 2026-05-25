@@ -16,10 +16,10 @@ triggers:
   - 이벤트 발표자료
   - 컨벤션 발표자료
   - 프레젠테이션 만들어
-version: 1.2
+version: 1.3
 ---
 
-# 기관·이벤트 슬라이드 생성 스킬 v1.2 (org-slide)
+# 기관·이벤트 슬라이드 생성 스킬 v1.3 (org-slide)
 
 `build-slide` 계보의 자립형 파생 스킬. 특정 채널/기관 톤에 종속되지 않고
 **스타일 기반 2개 템플릿**(기관 신뢰형 / 프리미엄 이벤트형)을 제공한다.
@@ -93,37 +93,43 @@ AskUserQuestion({
 
 → **"이 구성으로 진행할까요? 수정할 부분 있나요?"** 로 확인받는다. (수정 요청 시 아웃라인 갱신 후 재확인)
 
-### [Phase 3] 내장 템플릿(프리셋) 선택 질문
+### [Phase 3] 내장 템플릿(스타일) 선택 질문
 
-아웃라인 확정 **후**, 내장 템플릿 중 무엇으로 만들지 묻는다.
+아웃라인 확정 **후**, 내장 스타일 중 무엇으로 만들지 묻는다.
+템플릿이 6개(스타일 5 + 이벤트 다크 변형)라 **텍스트 메뉴**로 제시하고 번호로 받는다
+(AskUserQuestion은 4지선다 제한 → 발표 성격으로 후보를 좁혀 4개 이하로 물어도 됨).
 
 ```
-AskUserQuestion({
-  question: "어떤 내장 템플릿으로 만들까요?",
-  header: "Template",
-  multiSelect: false,
-  options: [
-    { label: "① 기관 신뢰형 (Institutional)",
-      description: "공공·기관 발표용. 인스티튜셔널 블루 #003764 + 레드 액센트(절제). 백색 베이스 + Pretendard. 정제·공공·명료한 플랫. → templates/institutional-sample.html" },
-    { label: "② 프리미엄 이벤트형 — 라이트 (기본 ⭐)",
-      description: "이벤트·컨퍼런스용. 백색 베이스 + 시안/마젠타/골드 단색 액센트(그라데이션 미사용). 밝고 깔끔, 범용. → templates/event-light-sample.html" },
-    { label: "③ 프리미엄 이벤트형 — 다크",
-      description: "미드나잇 인디고 + 시안/마젠타/골드 단색·글래스·글로우(그라데이션 미사용). 무대/키노트용. → templates/event-dark-sample.html" },
-  ]
-})
+"어떤 스타일로 만들까요?
+
+  ① 기관 신뢰형 (Institutional)   — 라이트
+     인스티튜셔널 블루 #003764 + 레드 절제. 공공·기관·정부. 플랫·신뢰.
+  ② 프리미엄 이벤트형 — 라이트 (기본 ⭐)
+     시안 #00C2D1 + 마젠타 + 골드 단색. 이벤트·컨퍼런스·범용.
+  ③ 프리미엄 이벤트형 — 다크
+     미드나잇 인디고 + 시안/마젠타 글로우. 무대·키노트.
+  ④ 에디토리얼 빅타입 (Editorial)   — 라이트
+     아이보리 + 잉크 + 버밀리언 #E63946, 큰 세리프. 비전·강연·브랜드 스토리.
+  ⑤ 웜 미니멀 (Soft Minimal)       — 라이트
+     샌드 + 세이지 #6B8F71 + 테라코타, 둥근 카드. 교육·워크숍·사내.
+  ⑥ 컨설팅 데이터형 (Consulting)   — 라이트
+     차콜 #1F2933 + 앰버 #E0A100, 표·차트 고밀도. 전략·IR·리포트.
+
+→ 번호 또는 명시적 스타일명"
 ```
 
-- 미응답·모호 시 발표 성격으로 추정(공공/기관 → ①, 비즈니스 이벤트 → ② 라이트 기본).
-- event는 **라이트가 기본**, 다크는 명시 선택(③)일 때만.
+- 발표 성격으로 후보를 좁혀 추정 가능: 공공/기관 → ①, 이벤트 → ②/③, 비전·강연 → ④, 교육·사내 → ⑤, 전략·데이터 → ⑥.
+- event는 **라이트가 기본**, 다크(③)는 명시 선택 시.
+- 매핑: ①`institutional` ②`event-light` ③`event(다크)` ④`editorial` ⑤`soft-minimal` ⑥`consulting`
 
 ### [Phase 4] 제작
 
 ```
 1. 디자인 명세 로딩 (이 폴더 내부)
    - Read design-system.md          (공통 원칙 + 컴포넌트 + §6 차트/인포 + §7 뷰어)
-   - Read presets/{institutional|event}.md   (선택 템플릿 토큰 · 톤 · 규칙; event는 다크/라이트 :root 구분)
+   - Read presets/{institutional|event|editorial|soft-minimal|consulting}.md  (선택 스타일 토큰·톤·규칙)
    - Read templates/base.html        (PPT 뷰어 + 전체화면 골조)
-   - 참고 샘플: templates/{institutional|event-light|event-dark}-sample.html
+   - 참고 샘플: templates/{institutional|event-light|event-dark|editorial|soft-minimal|consulting}-sample.html
 
 2. 슬라이드 HTML 생성
    - base.html 골조(PPT 뷰어·전체화면) + 선택 토큰을 :root 주입
@@ -142,26 +148,24 @@ AskUserQuestion({
 
 - 사용자가 이미 발표자료/주제를 제시 → Phase 1 생략하고 바로 Phase 2(아웃라인).
 - 사용자가 템플릿을 명시("기관 신뢰형으로", "이벤트 다크로") → Phase 3 생략하고 해당 템플릿 적용.
-- `/org-slide [자료경로] --preset={institutional|event|event-light}` 명시 호출 → Phase 1·3 생략, Phase 2부터.
+- `/org-slide [자료경로] --preset={institutional|event|event-light|editorial|soft-minimal|consulting}` 명시 호출 → Phase 1·3 생략.
 
 ## 슬래시 커맨드
 
-`/org-slide [발표자료 경로 또는 주제] [--preset=institutional|event|event-light]`
+`/org-slide [발표자료 경로 또는 주제] [--preset=institutional|event|event-light|editorial|soft-minimal|consulting]`
 
-## 두 템플릿 요약
+## 템플릿(스타일) 요약 — 5종
 
-| 항목 | ① institutional (기관 신뢰형) | ② event (프리미엄 이벤트형) |
-|---|---|---|
-| 성격 | 라이트 · 플랫 · 기관 신뢰 | 라이트(기본)/다크 · 프리미엄 (그라데이션 미사용) |
-| 베이스 | 백색 #FFFFFF / #F4F6F9 | 라이트 #FFFFFF · 다크 #141B34 |
-| 메인 | 인스티튜셔널 블루 #003764 | 네트워크 시안 #00C2D1(다) / #0094B3(라) |
-| 액센트 | 시그널 레드 #E4032E(절제) | 마젠타 #E5267E·#D81E74 / 골드 |
-| 폰트 | Pretendard + Noto Sans KR | Pretendard + Montserrat(라틴) |
-| 톤 | 신뢰·공공·정제·명료·안정 | 글로벌·역동·네트워킹·프리미엄·몰입 |
-| 모션 | 절제된 fade-up | scale + glow(솔리드) |
+| 스타일 | 베이스 | 메인 / 액센트 | 폰트 | 용도 |
+|---|---|---|---|---|
+| **institutional** 기관 신뢰형 | 라이트 백색 | 블루 `#003764` / 레드 `#E4032E` | Pretendard+Noto Sans | 공공·기관·정부 |
+| **event** 프리미엄 이벤트형 | 라이트(기본)/다크 `#141B34` | 시안 `#00C2D1` / 마젠타·골드 | Pretendard+Montserrat | 이벤트·컨퍼런스 (그라데이션 미사용) |
+| **editorial** 에디토리얼 빅타입 | 아이보리 `#FBF9F4` | 잉크 `#161616` / 버밀리언 `#E63946` | Fraunces/Noto Serif+Pretendard | 비전·강연·브랜드 스토리 |
+| **soft-minimal** 웜 미니멀 | 샌드 `#F6F1EA` | 세이지 `#6B8F71` / 테라코타 `#C8755A` | Pretendard(둥근) | 교육·워크숍·사내 |
+| **consulting** 컨설팅 데이터형 | 백색 | 차콜 `#1F2933` / 앰버 `#E0A100` | Pretendard(tabular) | 전략·IR·데이터 리포트 |
 
-상세 토큰: `presets/institutional.md`, `presets/event.md`
-디자인 원칙·컴포넌트: `design-system.md`
+상세 토큰: `presets/{institutional|event|editorial|soft-minimal|consulting}.md`
+디자인 원칙·컴포넌트·뷰어: `design-system.md`
 
 ## 책임 분리
 
@@ -172,6 +176,8 @@ AskUserQuestion({
 
 ## 변경 이력
 
+- v1.3 (2026-05-25): **스타일 템플릿 3종 추가** — `editorial`(에디토리얼 빅타입),
+  `soft-minimal`(웜 미니멀), `consulting`(컨설팅 데이터형). 총 5스타일. 2026 발표 디자인 트렌드 반영.
 - v1.2 (2026-05-25): **기관명 비종속 범용화** — 프리셋을 스타일 기반으로 리네이밍
   (knih→`institutional`, mice→`event`). 샘플의 특정 기관명 → `[기관명]`/`[조직명]` 플레이스홀더.
   공개 git 배포용. 발표자료→아웃라인→템플릿선택 워크플로우, MICE 그라데이션 제거 유지.
