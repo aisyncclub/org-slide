@@ -25,13 +25,72 @@
 
 ## 📦 설치
 
-이 저장소를 그대로 스킬 폴더로 클론하세요.
+`org-slide`는 별도 빌드가 필요 없는 **폴더형 스킬**입니다.
+아래 명령으로 원하는 스킬 폴더에 그대로 클론하면 설치가 끝납니다.
+
+### 1) Claude Code 전역 설치
+
+Claude Code에서 항상 사용할 거라면 이 위치에 설치하세요.
 
 ```bash
 git clone https://github.com/aisyncclub/org-slide.git ~/.claude/skills/org-slide
 ```
 
-또는 프로젝트 단위로 쓰려면 해당 레포의 `.claude/skills/org-slide/` 에 복사합니다.
+설치 후 Claude Code를 재시작하면 `org-slide` 스킬이 인식됩니다.
+
+### 2) Codex 전역 설치
+
+Codex에서도 같은 스킬을 쓰려면 아래 위치에 설치하세요.
+
+```bash
+git clone https://github.com/aisyncclub/org-slide.git ~/.codex/skills/org-slide
+```
+
+설치 후 Codex를 재시작하면 새 스킬 목록에 반영됩니다.
+
+### 3) 특정 프로젝트에만 설치
+
+프로젝트 하나에서만 쓰고 싶다면 해당 프로젝트 안에 설치합니다.
+
+```bash
+mkdir -p .claude/skills
+git clone https://github.com/aisyncclub/org-slide.git .claude/skills/org-slide
+```
+
+이 방식은 팀 프로젝트에 스킬을 함께 넣어 두고, 같은 템플릿 규칙을 공유할 때 좋습니다.
+
+### 4) 이미 설치한 경우 업데이트
+
+이미 설치되어 있다면 새로 클론하지 말고 설치 폴더에서 pull 하세요.
+
+```bash
+cd ~/.claude/skills/org-slide
+git pull
+```
+
+Codex 설치본을 업데이트하려면:
+
+```bash
+cd ~/.codex/skills/org-slide
+git pull
+```
+
+### 5) 설치 확인
+
+아래 파일이 보이면 정상 설치된 것입니다.
+
+```bash
+ls ~/.claude/skills/org-slide/SKILL.md
+ls ~/.codex/skills/org-slide/SKILL.md
+```
+
+스킬을 호출할 때는 예를 들어 이렇게 말하면 됩니다.
+
+> "org-slide로 기관 발표자료 만들어줘"  
+> "공공기관 슬라이드 만들어줘"  
+> "이벤트 발표자료 만들어줘"
+
+처음 실행하면 발표자료가 있는지 확인하고, 구성안 미리보기 → 템플릿 선택 → HTML 슬라이드 제작 순서로 진행합니다.
 
 ## 🚀 사용
 
